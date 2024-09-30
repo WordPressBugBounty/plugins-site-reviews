@@ -2,9 +2,10 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Validator;
 
+use GeminiLabs\SiteReviews\Contracts\ValidatorContract;
 use GeminiLabs\SiteReviews\Request;
 
-abstract class ValidatorAbstract
+abstract class ValidatorAbstract implements ValidatorContract
 {
     protected array $errors = [];
     protected Request $request;
@@ -14,19 +15,39 @@ abstract class ValidatorAbstract
         $this->request = $request;
     }
 
-    public function alreadyFailed(): bool
+    /**
+     * @compat < v7.1
+     * @todo remove in v8
+     */
+    public function __call(string $method, array $args = [])
     {
-        return is_array(glsr()->sessionGet('form_errors'));
+        if ('setErrors' === $method) {
+            call_user_func_array([$this, 'fail'], $args);
+            return;
+        }
+        throw new \BadMethodCallException("Method [$method] does not exist.");
     }
 
-    abstract public function isValid(): bool;
+    public function alreadyFailed(): bool
+    {
+        return glsr()->session()->cast('form_invalid', 'bool');
+    }
+
+    public function fail(string $message, ?string $loggedMessage = null): void
+    {
+        glsr()->sessionSet('form_errors', $this->errors);
+        glsr()->sessionSet('form_invalid', true);
+        glsr()->sessionSet('form_message', $message);
+        glsr()->sessionSet('form_values', $this->request->toArray());
+        if (!empty($loggedMessage)) {
+            glsr_log()->info($loggedMessage)->debug($this->request->toArray());
+        }
+    }
 
     public function request(): Request
     {
         return $this->request;
     }
-
-    abstract public function performValidation(): void;
 
     /**
      * @return static
@@ -37,15 +58,5 @@ abstract class ValidatorAbstract
             $this->performValidation();
         }
         return $this;
-    }
-
-    protected function setErrors(string $message, ?string $loggedMessage = null): void
-    {
-        glsr()->sessionSet('form_errors', $this->errors);
-        glsr()->sessionSet('form_message', $message);
-        glsr()->sessionSet('form_values', $this->request->toArray());
-        if (!empty($loggedMessage)) {
-            glsr_log()->info($loggedMessage)->debug($this->request->toArray());
-        }
     }
 }

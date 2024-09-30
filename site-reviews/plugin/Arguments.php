@@ -4,6 +4,7 @@ namespace GeminiLabs\SiteReviews;
 
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Cast;
+use GeminiLabs\SiteReviews\Helpers\Str;
 use GeminiLabs\SiteReviews\Modules\Sanitizer;
 
 class Arguments extends \ArrayObject
@@ -28,12 +29,20 @@ class Arguments extends \ArrayObject
 
     /**
      * @param mixed $key
+     */
+    public function array($key, array $fallback = []): array
+    {
+        return Arr::consolidate($this->get($key, $fallback));
+    }
+
+    /**
+     * @param mixed $key
      *
      * @return mixed
      */
-    public function cast($key, string $cast)
+    public function cast($key, string $cast, $fallback = null)
     {
-        return Cast::to($cast, $this->get($key));
+        return Cast::to($cast, $this->get($key, $fallback));
     }
 
     /**
@@ -45,9 +54,10 @@ class Arguments extends \ArrayObject
     public function get($key, $fallback = null)
     {
         $value = Arr::get($this->getArrayCopy(), $key, null);
-        return !is_null($fallback)
-            ? Helper::ifEmpty($value, $fallback)
-            : $value;
+        if (is_null($fallback)) {
+            return $value;
+        }
+        return Helper::ifEmpty($value, $fallback);
     }
 
     public function isEmpty(): bool

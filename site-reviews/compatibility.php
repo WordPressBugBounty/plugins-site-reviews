@@ -3,15 +3,46 @@
 use GeminiLabs\SiteReviews\Application;
 use GeminiLabs\SiteReviews\Compatibility;
 use GeminiLabs\SiteReviews\Contracts\BuilderContract;
+use GeminiLabs\SiteReviews\Database\ReviewManager;
 use GeminiLabs\SiteReviews\Modules\Paginate;
+use GeminiLabs\SiteReviews\Review;
 
 defined('ABSPATH') || exit;
 
 /**
+ * This fixes the button classes in themes using the Avia framework.
+ *
+ * @see https://kriesi.at/themes/enfold-overview/
+ */
+function glsr_filter_avia_button_classes(array $defaults): array
+{
+    $defaults['button'] = 'glsr-button avia-button avia-color-theme-color';
+    return $defaults;
+}
+add_action('avia_action_before_framework_init', function () {
+    add_filter('site-reviews/defaults/style-classes/defaults', 'glsr_filter_avia_button_classes');
+});
+
+/**
+ * This fixes the Duplicate option provided by the Enfold theme.
+ *
+ * @see https://kriesi.at/themes/enfold-overview/
+ */
+add_action('avf_duplicate_post_added', function ($newPostId, $post) {
+    if (!Review::isReview($post)) {
+        return;
+    }
+    $review = glsr_get_review($post->ID);
+    if ($review->isValid()) {
+        glsr(ReviewManager::class)->createFromPost((int) $newPostId, $review->toArray());
+    }
+}, 10, 2);
+
+/**
  * Classic Editor.
- * 
+ *
  * @return array
- * 
+ *
  * @see https://wordpress.org/plugins/classic-editor/
  */
 add_action('edit_form_top', function ($post) {
@@ -41,8 +72,7 @@ function glsr_filter_bootstrap_pagination_link(array $link, array $args, Builder
     ]);
     return $link;
 }
-add_filter('site-reviews/paginate_links', function (string $links, array $args): string
-{
+add_filter('site-reviews/paginate_links', function (string $links, array $args): string {
     if ('bootstrap' !== glsr_get_option('general.style')) {
         return $links;
     }
@@ -57,9 +87,9 @@ add_filter('site-reviews/paginate_links', function (string $links, array $args):
 /**
  * @param array $editors
  * @param string $postType
- * 
+ *
  * @return array
- * 
+ *
  * @see https://wordpress.org/plugins/classic-editor/
  */
 add_filter('classic_editor_enabled_editors_for_post_type', function ($editors, $postType) {
@@ -70,9 +100,9 @@ add_filter('classic_editor_enabled_editors_for_post_type', function ($editors, $
 
 /**
  * Add human-readable capability names.
- * 
+ *
  * @return void
- * 
+ *
  * @see https://wordpress.org/plugins/members/
  */
 add_action('members_register_caps', function () {
@@ -102,7 +132,7 @@ add_action('members_register_caps', function () {
 
 /**
  * Remove Oxygen Builder metabox from reviews.
- * 
+ *
  * @see https://oxygenbuilder.com
  */
 add_action('plugins_loaded', function () {
@@ -115,11 +145,11 @@ add_action('plugins_loaded', function () {
 
 /**
  * Fix to display all reviews when sorting by rank.
- * 
+ *
  * @param array $query
- * 
+ *
  * @return array
- * 
+ *
  * @see https://searchandfilter.com/
  */
 add_filter('sf_edit_query_args', function ($query) {
@@ -136,11 +166,11 @@ add_filter('sf_edit_query_args', function ($query) {
 
 /**
  * Prevent SG Optimizer from breaking the Site Reviews javascript file.
- * 
+ *
  * @param array $excluded
- * 
+ *
  * @return array
- * 
+ *
  * @see https://wordpress.org/plugins/sg-cachepress/
  */
 add_filter('sgo_js_minify_exclude', function ($excluded) {
@@ -170,8 +200,7 @@ function glsr_load_ninja_forms_css(): void
 }
 add_action('enqueue_block_editor_assets', 'glsr_load_ninja_forms_css');
 add_action('wp_enqueue_scripts', 'glsr_load_ninja_forms_css');
-add_filter('site-reviews/config/styles/ninja_forms', function (array $config): array
-{
+add_filter('site-reviews/config/styles/ninja_forms', function (array $config): array {
     if (glsr_is_ninja_forms_compatible()) {
         $formClass = 'nf-style-'.Ninja_Forms()->get_setting('opinionated_styles');
         $config = glsr_set($config, 'classes.form', $formClass);
@@ -181,11 +210,10 @@ add_filter('site-reviews/config/styles/ninja_forms', function (array $config): a
 
 /**
  * Load the WPForms stylesheet when using the WPForms plugin style.
- * 
+ *
  * @see https://wordpress.org/plugins/wpforms-lite/
  */
-add_filter('site-reviews/build/template/reviews-form', function (string $template): string
-{
+add_filter('site-reviews/build/template/reviews-form', function (string $template): string {
     if ('wpforms' === glsr_get_option('general.style')) {
         add_filter('wpforms_frontend_missing_assets_error_js_disable', '__return_true', PHP_INT_MAX);
         add_filter('wpforms_global_assets', '__return_true');
@@ -195,42 +223,15 @@ add_filter('site-reviews/build/template/reviews-form', function (string $templat
 
 /**
  * Remove the "Launch Thrive Architect" button from reviews.
- * 
+ *
  * @return array
- * 
+ *
  * @see https://thrivethemes.com/architect/
  */
 add_filter('tcb_post_types', function ($blacklist) {
     $blacklist[] = glsr()->post_type;
     return $blacklist;
 });
-
-/**
- * This is run on wp_loaded.
- * Checks for updates for outdated addons which don't use the "site-reviews/addon/update" hook
- * @param \GeminiLabs\SiteReviews\Application $app
- */
-add_action('site-reviews/addon/update', function ($app) {
-    $addons = [
-        'site-reviews-filters/site-reviews-filters.php' => 'GeminiLabs\SiteReviews\Addon\Filters\Application',
-        'site-reviews-forms/site-reviews-forms.php' => 'GeminiLabs\SiteReviews\Addon\Forms\Application',
-        'site-reviews-images/site-reviews-images.php' => 'GeminiLabs\SiteReviews\Addon\Images\Application',
-        'site-reviews-notifications/site-reviews-notifications.php' => 'GeminiLabs\SiteReviews\Addon\Notifications\Application',
-        'site-reviews-themes/site-reviews-themes.php' => 'GeminiLabs\SiteReviews\Addon\Themes\Application',
-    ];
-    foreach ($addons as $basename => $addon) {
-        $file = trailingslashit(WP_PLUGIN_DIR).$basename;
-        try {
-            $reflection = new \ReflectionClass($addon);
-            $addonId = $reflection->getConstant('ID');
-            if (file_exists($file) && !array_key_exists($addonId, $app->updated)) {
-                $app->update($addon, $file);
-            }
-        } catch (\ReflectionException $e) {
-            // Fail silently
-        }
-    }
-}, 20);
 
 /**
  * This disables OptimizePress v2 assets an notices on Site Reviews admin pages.

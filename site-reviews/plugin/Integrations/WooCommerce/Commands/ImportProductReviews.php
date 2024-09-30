@@ -7,49 +7,55 @@ use GeminiLabs\SiteReviews\Commands\CreateReview;
 use GeminiLabs\SiteReviews\Database;
 use GeminiLabs\SiteReviews\Database\Query;
 use GeminiLabs\SiteReviews\Database\ReviewManager;
+use GeminiLabs\SiteReviews\Defaults\ImportResultDefaults;
 use GeminiLabs\SiteReviews\Helpers\Arr;
-use GeminiLabs\SiteReviews\Helpers\Cast;
 use GeminiLabs\SiteReviews\Helpers\Str;
 use GeminiLabs\SiteReviews\Request;
 
 class ImportProductReviews extends AbstractCommand
 {
-    public const PER_PAGE = 25;
-
-    public int $offset = 0;
-    /** @var Request */
-    public $request;
-    public int $total = 0;
+    protected int $limit;
+    protected int $offset;
+    protected array $response;
 
     public function __construct(Request $request)
     {
-        $this->offset = max(0, ($request->cast('page', 'int') - 1) * static::PER_PAGE); // @phpstan-ignore-line
-        $this->request = $request;
+        $this->limit = max(1, $request->cast('per_page', 'int'));
+        $this->offset = $this->limit * (max(1, $request->cast('page', 'int')) - 1);
+        $this->response = [];
     }
 
     public function handle(): void
     {
         define('WP_IMPORTING', true);
         wp_raise_memory_limit('admin');
-        $this->total = 0;
+        wp_defer_term_counting(true);
+        wp_suspend_cache_invalidation(true);
         $reviews = $this->reviews();
         foreach ($reviews as $commentId => $values) {
-            $values = (array) $values;
+            $values = Arr::consolidate($values);
             $values = array_map('trim', $values);
             $request = new Request($values);
             $command = new CreateReview($request);
             if (glsr(ReviewManager::class)->create($command)) {
                 update_comment_meta((int) $commentId, 'imported', 1);
-                ++$this->total;
+                ++$this->response['imported'];
+                continue;
             }
+            ++$this->response['skipped'];
         }
+        unset($reviews);
+        wp_defer_term_counting(false);
+        wp_suspend_cache_invalidation(false);
     }
 
     public function response(): array
     {
-        return [
-            'processed' => $this->total,
-        ];
+        return glsr(ImportResultDefaults::class)->restrict(
+            wp_parse_args([
+                'message' => _x('Imported %d of %d reviews', 'admin-text', 'site-reviews'),
+            ], $this->response)
+        );
     }
 
     /**
@@ -76,7 +82,7 @@ class ImportProductReviews extends AbstractCommand
             LIMIT %d
             OFFSET %d
         ";
-        $sql = glsr(Query::class)->sql($sql, static::PER_PAGE, $this->offset);
+        $sql = glsr(Query::class)->sql($sql, $this->limit, $this->offset);
         $results = glsr(Database::class)->dbGetCol($sql);
         return Arr::uniqueInt($results);
     }

@@ -2,11 +2,13 @@
 
 namespace GeminiLabs\SiteReviews\Commands;
 
+use GeminiLabs\SiteReviews\Arguments;
 use GeminiLabs\SiteReviews\Database\ReviewManager;
 use GeminiLabs\SiteReviews\Defaults\CreateReviewDefaults;
 use GeminiLabs\SiteReviews\Defaults\CustomFieldsDefaults;
 use GeminiLabs\SiteReviews\Helper;
 use GeminiLabs\SiteReviews\Helpers\Arr;
+use GeminiLabs\SiteReviews\Helpers\Str;
 use GeminiLabs\SiteReviews\Helpers\Url;
 use GeminiLabs\SiteReviews\Modules\Avatar;
 use GeminiLabs\SiteReviews\Modules\Encryption;
@@ -25,7 +27,6 @@ class CreateReview extends AbstractCommand
     public $assigned_users;
     public $author_id;
     public $avatar;
-    public $blacklisted;
     public $content;
     public $custom;
     public $date;
@@ -49,16 +50,15 @@ class CreateReview extends AbstractCommand
     public $type;
     public $url;
 
-    protected $errors;
-    protected $message;
-    protected $review;
+    protected Review $review;
+    protected Arguments $validation;
 
     public function __construct(Request $request)
     {
-        $request = $this->normalize($request); // IP address is set here
-        $this->setProperties($request->toArray());
-        $this->request = $request;
+        $this->request = $this->normalize($request); // IP address is set here
+        $this->setProperties(); // do this after setting the request
         $this->review = new Review($this->toArray(), $init = false);
+        $this->validation = new Arguments();
         $this->custom = $this->custom();
         $this->type = $this->type();
         $this->avatar = $this->avatar(); // do this last
@@ -85,17 +85,17 @@ class CreateReview extends AbstractCommand
         $request->merge([
             'excluded' => glsr(Encryption::class)->encrypt(implode(',', $excluded)),
         ]);
-        $validator = glsr(ValidateForm::class)->validate($request, [ // order is intentional
+        $validators = glsr()->filterArray('validators', [ // order is intentional
             DefaultValidator::class,
             DuplicateValidator::class,
             CustomValidator::class,
         ]);
-        if (!$validator->isValid()) {
-            glsr_log()->warning($validator->errors);
-            return false;
+        $validator = glsr(ValidateForm::class)->validate($request, $validators);
+        if ($validator->isValid()) {
+            return true;
         }
-        glsr()->sessionClear();
-        return true;
+        glsr_log()->warning($validator->result()->errors);
+        return false;
     }
 
     public function referer(): string
@@ -123,9 +123,9 @@ class CreateReview extends AbstractCommand
     public function response(): array
     {
         return [
-            'errors' => $this->errors,
+            'errors' => $this->validation->array('errors'),
             'html' => (string) $this->review,
-            'message' => $this->message,
+            'message' => $this->validation->cast('message', 'string'),
             'redirect' => $this->redirect(),
             'review' => $this->review->toArray(['email', 'ip_address']),
             'reviews' => $this->reloadedReviews(),
@@ -134,11 +134,7 @@ class CreateReview extends AbstractCommand
 
     public function successful(): bool
     {
-        if (false === $this->errors) {
-            glsr()->sessionClear();
-            return true;
-        }
-        return false;
+        return false === $this->validation->failed;
     }
 
     public function toArray(): array
@@ -151,9 +147,7 @@ class CreateReview extends AbstractCommand
     public function validate(): bool
     {
         $validator = glsr(ValidateForm::class)->validate($this->request);
-        $this->blacklisted = $validator->blacklisted;
-        $this->errors = $validator->errors;
-        $this->message = $validator->message;
+        $this->validation = $validator->result();
         return $validator->isValid();
     }
 
@@ -167,20 +161,24 @@ class CreateReview extends AbstractCommand
 
     protected function create(): void
     {
+        $message = __('Your review could not be submitted and the error has been logged. Please notify the site administrator.', 'site-reviews');
         if ($review = glsr(ReviewManager::class)->create($this)) {
-            $this->message = $review->is_approved
+            $this->review = $review; // overwrite the dummy review with the submitted review
+            $message = $review->is_approved
                 ? __('Your review has been submitted!', 'site-reviews')
                 : __('Your review has been submitted and is pending approval.', 'site-reviews');
-            $this->review = $review; // overwrite the dummy review with the submitted review
-            return;
         }
-        $this->errors = [];
-        $this->message = __('Your review could not be submitted and the error has been logged. Please notify the site administrator.', 'site-reviews');
+        $this->validation->set('message', $message);
     }
 
     protected function custom(): array
     {
-        return glsr(CustomFieldsDefaults::class)->filter($this->request->toArray());
+        $fields = [];
+        foreach ($this->request->toArray() as $key => $value) {
+            $key = Str::removePrefix($key, 'custom_');
+            $fields[$key] = $value;
+        }
+        return glsr(CustomFieldsDefaults::class)->filter($fields);
     }
 
     protected function normalize(Request $request): Request
@@ -211,12 +209,14 @@ class CreateReview extends AbstractCommand
         return sanitize_text_field($redirect);
     }
 
-    protected function setProperties(array $properties): void
+    protected function setProperties(): void
     {
-        $values = glsr(CreateReviewDefaults::class)->restrict($properties);
-        foreach ($values as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->{$key} = $value;
+        $properties = (new \ReflectionClass($this))->getProperties(\ReflectionProperty::IS_PUBLIC);
+        $values = glsr(CreateReviewDefaults::class)->restrict($this->request->toArray());
+        foreach ($properties as $property) {
+            $key = $property->getName();
+            if (array_key_exists($key, $values)) {
+                $property->setValue($this, $values[$key]);
             }
         }
         if (!empty($this->date) && empty($this->date_gmt)) {

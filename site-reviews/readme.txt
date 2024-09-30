@@ -3,7 +3,7 @@ Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
 Tested up to: 6.6
-Stable tag: 7.0.18
+Stable tag: 7.1.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -193,6 +193,22 @@ You can report any security bugs found in the source code of this plugin through
 This update requires a minimum of PHP 7.4 and WordPress 6.1. There are a few potentially breaking changes, so please make sure to read the plugin's changelog and Upgrade Guide after updating.
 
 == Changelog ==
+
+= 7.1.1 (2024-09-27) =
+
+- Fixed the review count in pagination and the rating summary when multiple post assignments are used
+
+= 7.1.0 (2024-09-26) =
+
+- Added "Resend Verification Email" button to reviews.
+- Added the previous major version to the Rollback tool (i.e. you can now rollback from v7 to v6).
+- Updated the addon update checker to use the WordPress update hooks.
+- Updated the review exporter to support images (Review Images addon required) and custom fields (Review Forms addon required).
+- Updated the review importer to support images (Review Images addon required), custom fields (Review Forms addon required), and skip already imported reviews.
+- Fixed compatibility with the Enfold theme's duplicate post feature.
+- Fixed multilingual taxonomy integration.
+- Fixed some visual inconsistancies in the admin.
+- Fixed the review count in the dashboard widget.
 
 = 7.0.18 (2024-08-16) =
 

@@ -103,8 +103,10 @@ class ReviewManager
     public function createRaw(CreateReview $command)
     {
         $values = glsr()->args($command->toArray()); // this filters the values
+        $submitted = $command->request->toArray();
         $metaInput = [
-            '_submitted' => $command->request->toArray(), // save the original submitted request in metadata
+            '_submitted' => $submitted, // save the original submitted request in metadata
+            '_submitted_hash' => md5(maybe_serialize($submitted)),
         ];
         $values = [
             'comment_status' => 'closed',
@@ -343,7 +345,7 @@ class ReviewManager
             $requireApprovalForRating = glsr(OptionManager::class)->getInt('settings.general.require.approval_for', 5);
             $isApproved = !$requireApproval || $command->rating > $requireApprovalForRating;
         }
-        return !$isApproved || ('local' === $command->type && $command->blacklisted)
+        return !$isApproved || ('local' === $command->type && $command->request->cast('blacklisted', 'bool'))
             ? 'pending'
             : 'publish';
     }

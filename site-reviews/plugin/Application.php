@@ -28,7 +28,6 @@ use GeminiLabs\SiteReviews\Modules\Queue;
  * @property array     $session
  * @property Arguments $storage
  * @property string    $taxonomy
- * @property array     $updated
  * @property string    $version
  * @property string    $testedTo;
  */
@@ -38,7 +37,7 @@ final class Application extends Container implements PluginContract
     use Session;
     use Storage;
 
-    public const DB_VERSION = '1.3';
+    public const DB_VERSION = '1.4';
     public const EXPORT_KEY = '_glsr_export';
     public const ID = 'site-reviews';
     public const PAGED_HANDLE = 'pagination_request';
@@ -51,7 +50,6 @@ final class Application extends Container implements PluginContract
     protected array $defaults;
     protected string $name;
     protected array $settings;
-    protected array $updated = [];
 
     public function addon(string $addonId)
     {
@@ -179,10 +177,8 @@ final class Application extends Container implements PluginContract
 
     /**
      * This is triggered on "plugins_loaded" by "site-reviews/addon/register".
-     *
-     * @param PluginContract|string $addon
      */
-    public function register($addon, bool $authorized = true): void
+    public function register(string $addon, bool $isAuthorized = true): void
     {
         $retired = [ // @compat these addons have been retired
             'site-reviews-gamipress',
@@ -191,28 +187,39 @@ final class Application extends Container implements PluginContract
         $premium = glsr()->filterArray('site-reviews-premium', []);
         try {
             $reflection = new \ReflectionClass($addon); // make sure that the class exists
-            $addon = $reflection->getName();
-            if (in_array($reflection->getConstant('ID'), $retired)) {
-                $this->append('retired', $addon);
-                return;
-            }
-            if (in_array($reflection->getConstant('ID'), $premium)
-                && !str_starts_with($reflection->getNamespaceName(), 'GeminiLabs\SiteReviews\Premium')) {
-                $this->append('site-reviews-premium', $addon);
-                return;
-            }
-            if (true === $reflection->getConstant('LICENSED')) {
-                $this->append('licensed', $addon);
-            }
-            if (true === $authorized) {
-                $this->addons[$addon::ID] = $addon;
-                $this->singleton($addon); // this goes first!
-                $this->alias($addon::ID, $this->make($addon)); // @todo for some reason we have to link an alias to an instantiated class
-                $instance = $this->make($addon)->init();
-                $this->append('addons', $instance->version, $instance->id);
-            }
         } catch (\ReflectionException $e) {
-            glsr_log()->error('Attempted to register an invalid addon.');
+            glsr_log()->error("Attempted to register an invalid addon [$addon]");
+            return;
+        }
+        $addonId = $reflection->getConstant('ID');
+        $file = dirname(dirname($reflection->getFileName()));
+        $file = trailingslashit($file).$addonId.'.php';
+        if (!file_exists($file)) {
+            glsr_log()->error("Attempted to register an invalid addon [$addonId].");
+            return;
+        }
+        if (in_array($addonId, $retired)) {
+            $this->append('retired', $addon);
+            return;
+        }
+        if (in_array($addonId, $premium)
+            && !str_starts_with($reflection->getNamespaceName(), 'GeminiLabs\SiteReviews\Premium')) {
+            $this->append('site-reviews-premium', $addon);
+            return;
+        }
+        $pluginData = get_file_data($file, ['update_url' => 'Update URI'], 'plugin');
+        if (empty($pluginData['update_url'])) {
+            $this->append('compat', $file, $addonId); // this addon needs updating in compatibility mode.
+        }
+        if (true === $reflection->getConstant('LICENSED')) {
+            $this->append('licensed', $addon, $addonId);
+        }
+        if (true === $isAuthorized) {
+            $this->addons[$addonId] = $addon;
+            $this->singleton($addon); // this goes first!
+            $this->alias($addonId, $this->make($addon)); // @todo for some reason we have to link an alias to an instantiated class
+            $instance = $this->make($addon)->init();
+            $this->append('addons', $instance->version, $instance->id);
         }
     }
 
@@ -242,35 +249,5 @@ final class Application extends Container implements PluginContract
         }
         $settings = Arr::unflatten($this->settings);
         return Arr::get($settings, $path);
-    }
-
-    /**
-     * This is triggered on "init:5" by "site-reviews/addon/update" in MainController::onInit.
-     *
-     * @param PluginContract|string $addon
-     */
-    public function update($addon, string $file): void
-    {
-        if (!current_user_can('manage_options') && !wp_doing_cron()) {
-            return;
-        }
-        if (!file_exists($file)) {
-            glsr_log()->error("Addon does not exist: $file")->debug($addon);
-        }
-        $this->license($addon);
-        try {
-            $reflection = new \ReflectionClass($addon);
-            $addonId = $reflection->getConstant('ID');
-            $licensed = $reflection->getConstant('LICENSED');
-            $updateUrl = $reflection->getConstant('UPDATE_URL');
-            if ($addonId && $updateUrl && !array_key_exists($addonId, $this->updated)) {
-                $license = glsr_get_option("licenses.{$addonId}");
-                $updater = new Updater($updateUrl, $file, $addonId, compact('license'));
-                $updater->init();
-                $this->updated[$addonId] = compact('file', 'licensed', 'updateUrl'); // store details for license verification in settings
-            }
-        } catch (\ReflectionException $e) {
-            // We don't need to log an error here.
-        }
     }
 }
