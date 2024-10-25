@@ -5,6 +5,7 @@ namespace GeminiLabs\SiteReviews;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Cast;
 use GeminiLabs\SiteReviews\Helpers\Str;
+use GeminiLabs\SiteReviews\Modules\Captcha;
 use GeminiLabs\SiteReviews\Modules\Encryption;
 
 class Request extends Arguments
@@ -58,9 +59,11 @@ class Request extends Arguments
         if (in_array($action, [glsr()->prefix.'admin_action', glsr()->prefix.'public_action'])) {
             $values['_ajax_request'] = true;
         }
-        if ('submit-review' === Helper::filterInput('_action', $values)) {
+        $requestAction = Helper::filterInput('_action', $values);
+        if (in_array($requestAction, glsr(Captcha::class)->actions())) {
             $values['_frcaptcha'] = Helper::filterInput('frc-captcha-solution');
             $values['_hcaptcha'] = Helper::filterInput('h-captcha-response');
+            $values['_procaptcha'] = Helper::filterInput('procaptcha-response');
             $values['_recaptcha'] = Helper::filterInput('g-recaptcha-response');
             $values['_turnstile'] = Helper::filterInput('cf-turnstile-response');
         }

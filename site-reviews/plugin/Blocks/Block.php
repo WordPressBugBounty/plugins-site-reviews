@@ -7,6 +7,7 @@ use GeminiLabs\SiteReviews\Contracts\ShortcodeContract;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Cast;
 use GeminiLabs\SiteReviews\Helpers\Str;
+use GeminiLabs\SiteReviews\Modules\Html\Builder;
 
 abstract class Block
 {
@@ -54,7 +55,7 @@ abstract class Block
         $block = Str::snakeCase($block);
         $block = str_replace(['_block', 'site_reviews_', 'site_'], '', $block);
         register_block_type(glsr()->id."/{$block}", [
-            'attributes' => $this->app()->filterArray("block/{$block}/attributes", $this->attributes()),
+            'attributes' => $this->app()->filterArray("block/{$block}/attributes", $this->attributes(), $block),
             'editor_script' => "{$this->app()->id}/blocks",
             'editor_style' => "{$this->app()->id}/blocks",
             'render_callback' => [$this, 'render'],
@@ -63,6 +64,17 @@ abstract class Block
     }
 
     abstract public function render(array $attributes): string;
+
+    protected function buildEmptyBlock(string $text): string
+    {
+        return glsr(Builder::class)->div([
+            'class' => 'block-editor-warning',
+            'text' => glsr(Builder::class)->p([
+                'class' => 'block-editor-warning__message',
+                'text' => $text,
+            ]),
+        ]);
+    }
 
     protected function hasVisibleFields(ShortcodeContract $shortcode, array $attributes): bool
     {

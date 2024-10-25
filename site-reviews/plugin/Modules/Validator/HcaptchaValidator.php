@@ -2,10 +2,35 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Validator;
 
+use GeminiLabs\SiteReviews\Defaults\CaptchaConfigDefaults;
 use GeminiLabs\SiteReviews\Modules\Captcha;
 
-class HcaptchaValidator extends CaptchaValidator
+class HcaptchaValidator extends CaptchaValidatorAbstract
 {
+    /**
+     * @see https://docs.hcaptcha.com/
+     */
+    public function config(): array
+    {
+        $language = $this->getLocale();
+        $urlParameters = array_filter([
+            'hl' => $language,
+            'render' => 'explicit',
+        ]);
+        return glsr(CaptchaConfigDefaults::class)->merge([
+            'badge' => glsr_get_option('forms.captcha.position'),
+            'class' => 'glsr-h-captcha', // @compat
+            'language' => $language,
+            'sitekey' => $this->siteKey(),
+            'size' => 'normal',
+            'theme' => glsr_get_option('forms.captcha.theme'),
+            'type' => 'hcaptcha',
+            'urls' => [
+                'nomodule' => add_query_arg($urlParameters, 'https://js.hcaptcha.com/1/api.js'),
+            ],
+        ]);
+    }
+
     public function isEnabled(): bool
     {
         return glsr(Captcha::class)->isEnabled('hcaptcha');
@@ -16,8 +41,8 @@ class HcaptchaValidator extends CaptchaValidator
         return [
             'remoteip' => $this->request->ip_address,
             'response' => $this->token(),
-            'secret' => glsr_get_option('forms.hcaptcha.secret'),
-            'sitekey' => glsr_get_option('forms.hcaptcha.key'),
+            'secret' => $this->siteSecret(),
+            'sitekey' => $this->siteKey(),
         ];
     }
 
@@ -38,13 +63,23 @@ class HcaptchaValidator extends CaptchaValidator
 
     protected function errors(array $errors): array
     {
-        if (empty(glsr_get_option('forms.hcaptcha.key'))) {
+        if (empty($this->siteKey())) {
             $errors[] = 'sitekey_missing';
         }
         return parent::errors($errors);
     }
 
-    protected function siteverifyUrl(): string
+    protected function siteKey(): string
+    {
+        return glsr_get_option('forms.hcaptcha.key');
+    }
+
+    protected function siteSecret(): string
+    {
+        return glsr_get_option('forms.hcaptcha.secret');
+    }
+
+    protected function siteVerifyUrl(): string
     {
         return 'https://hcaptcha.com/siteverify';
     }

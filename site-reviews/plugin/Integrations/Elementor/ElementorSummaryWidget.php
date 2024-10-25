@@ -31,6 +31,11 @@ class ElementorSummaryWidget extends ElementorWidget
         return _x('Rating Summary', 'admin-text', 'site-reviews');
     }
 
+    protected function hide_if_all_fields_hidden(): bool
+    {
+        return true;
+    }
+
     protected function settings_advanced(): array
     {
         $settings = parent::settings_advanced();
@@ -224,14 +229,14 @@ class ElementorSummaryWidget extends ElementorWidget
         return [
             'rating_color' => [
                 'global' => [
-                    'active' => false,
+                    'default' => '',
                 ],
                 'label' => esc_html_x('Color', 'admin-text', 'site-reviews'),
                 'selectors' => [
                     '{{WRAPPER}} .glsr:not([data-theme]) .glsr-bar-background-percent' => '--glsr-bar-bg: {{VALUE}} !important',
-                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-empty' => 'background: {{VALUE}} !important; mask-image: var(--glsr-star-empty); mask-size: 100%;',
-                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-full' => 'background: {{VALUE}} !important; mask-image: var(--glsr-star-full); mask-size: 100%;',
-                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-half' => 'background: {{VALUE}} !important; mask-image: var(--glsr-star-half); mask-size: 100%;',
+                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-empty' => 'background: {{VALUE}} !important;',
+                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-full' => 'background: {{VALUE}} !important;',
+                    '{{WRAPPER}} .glsr:not([data-theme]) .glsr-star-half' => 'background: {{VALUE}} !important;',
                 ],
                 'type' => Controls_Manager::COLOR,
             ],

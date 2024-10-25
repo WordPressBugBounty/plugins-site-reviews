@@ -16,9 +16,17 @@ class Hooks extends AbstractHooks
     {
         $this->hook(Controller::class, [
             ['declareHposCompatibility', 'before_woocommerce_init'],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/enabled', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/style', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/summary', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/reviews', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/form', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/sorting', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/display_empty', 10, 3],
+            ['filterOrphanedOptions', 'site-reviews/option/addon/woocommerce/wp_comments', 10, 3],
             ['filterSettings', 'site-reviews/settings'],
             ['filterSettingsCallback', 'site-reviews/settings/sanitize', 10, 2],
-            ['filterSubsubsub', 'site-reviews/addon/subsubsub'],
+            ['filterSubsubsub', 'site-reviews/integration/subsubsub'],
             ['renderNotice', 'admin_init'],
             ['renderSettings', 'site-reviews/settings/woocommerce'],
         ]);
@@ -37,7 +45,7 @@ class Hooks extends AbstractHooks
 
     protected function experimentalHooks(): array
     {
-        if ('yes' !== $this->option('addons.woocommerce.wp_comments')) {
+        if ('yes' !== $this->option('integrations.woocommerce.wp_comments')) {
             return [];
         }
         return [
@@ -48,10 +56,18 @@ class Hooks extends AbstractHooks
 
     protected function isEnabled(): bool
     {
-        return 'yes' === $this->option('addons.woocommerce.enabled')
+        return 'yes' === $this->option('integrations.woocommerce.enabled')
             && 'yes' === get_option('woocommerce_enable_reviews', 'yes')
             && class_exists('WooCommerce')
             && function_exists('WC');
+    }
+
+    protected function isWooBlockTheme(): bool
+    {
+        if (!class_exists('Automattic\WooCommerce\Blocks\Utils\BlockTemplateUtils')) {
+            return false;
+        }
+        return \Automattic\WooCommerce\Blocks\Utils\BlockTemplateUtils::supports_block_templates();
     }
 
     protected function mainHooks(): array
@@ -79,9 +95,9 @@ class Hooks extends AbstractHooks
 
     protected function productHooks(): array
     {
-        return [
+        $hooks = [
             ['filterCommentsTemplate', 'comments_template', 50],
-            ['filterGetRatingHtml', 'woocommerce_product_get_rating_html', 10, 3],
+            ['filterGetRatingHtml', 'woocommerce_product_get_rating_html', 20, 3],
             ['filterGetStarRatingHtml', 'woocommerce_get_star_rating_html', 10, 3],
             ['filterProductAverageRating', 'woocommerce_product_get_average_rating', 10, 2],
             ['filterProductDataTabs', 'woocommerce_product_data_tabs'],
@@ -102,10 +118,13 @@ class Hooks extends AbstractHooks
             ['renderProductDataPanel', 'woocommerce_product_data_panels'],
             ['renderQuickEditField', 'quick_edit_custom_box', 5, 2],
             ['renderReviews', 'site-reviews/woocommerce/render/product/reviews'],
-            ['renderTitleRating', 'woocommerce_single_product_summary'],
             ['updateProductData', 'woocommerce_admin_process_product_object'],
             ['updateProductRatingCounts', 'site-reviews/ratings/count/post', 10, 2],
         ];
+        if (!$this->isWooBlockTheme()) {
+            $hooks[] = ['renderTitleRating', 'woocommerce_single_product_summary'];
+        }
+        return $hooks;
     }
 
     protected function restApiHooks(): array

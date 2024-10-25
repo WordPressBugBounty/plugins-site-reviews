@@ -106,27 +106,14 @@ abstract class ElementorWidget extends Widget_Base
         ];
     }
 
-    protected function get_review_types(): array
+    protected function hide_if_all_fields_hidden(): bool
     {
-        $types = glsr()->retrieveAs('array', 'review_types', []);
-        if (count($types) > 2) {
-            return [
-                'default' => 'local',
-                'label' => _x('Limit the Type of Reviews', 'admin-text', 'site-reviews'),
-                'label_block' => true,
-                'options' => $types,
-                'type' => Controls_Manager::SELECT,
-            ];
-        }
-        return [];
+        return false;
     }
 
-    /**
-     * @return void
-     */
-    protected function register_controls()
+    protected function get_control_sections(): array
     {
-        $sections = [
+        return [
             'settings' => [
                 'controls' => $this->settings_basic(),
                 'label' => _x('Settings', 'admin-text', 'site-reviews'),
@@ -148,6 +135,29 @@ abstract class ElementorWidget extends Widget_Base
                 'tab' => Controls_Manager::TAB_STYLE,
             ],
         ];
+    }
+
+    protected function get_review_types(): array
+    {
+        $types = glsr()->retrieveAs('array', 'review_types', []);
+        if (count($types) > 2) {
+            return [
+                'default' => 'local',
+                'label' => _x('Limit the Type of Reviews', 'admin-text', 'site-reviews'),
+                'label_block' => true,
+                'options' => $types,
+                'type' => Controls_Manager::SELECT,
+            ];
+        }
+        return [];
+    }
+
+    /**
+     * @return void
+     */
+    protected function register_controls()
+    {
+        $sections = $this->get_control_sections();
         $sections = glsr()->filterArray('elementor/register/controls', $sections, $this);
         foreach ($sections as $key => $args) {
             $controls = array_filter($args['controls'] ?? []);
@@ -163,6 +173,11 @@ abstract class ElementorWidget extends Widget_Base
     protected function register_controls_for_section(array $controls): void
     {
         foreach ($controls as $key => $args) {
+            if ($args['group_control_type'] ?? false) {
+                $args['name'] = $key;
+                $this->add_group_control($args['group_control_type'], $args);
+                continue;
+            }
             if ($args['is_responsive'] ?? false) {
                 $this->add_responsive_control($key, $args);
                 continue;
@@ -176,9 +191,14 @@ abstract class ElementorWidget extends Widget_Base
      */
     protected function render()
     {
-        $shortcode = $this->get_shortcode_instance()->build($this->get_settings_for_display(), 'elementor');
-        $shortcode = str_replace('class="glsr-fallback">', 'class="glsr-fallback" style="display:none;">', $shortcode);
-        echo $shortcode;
+        $args = $this->get_settings_for_display();
+        $shortcode = $this->get_shortcode_instance();
+        if ($this->hide_if_all_fields_hidden() && !$shortcode->hasVisibleFields($args)) {
+            return;
+        }
+        $html = $shortcode->build($args, 'elementor');
+        $html = str_replace('class="glsr-fallback">', 'class="glsr-fallback" style="display:none;">', $html);
+        echo $html;
     }
 
     protected function set_custom_size_unit(array $units): array

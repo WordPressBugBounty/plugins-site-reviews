@@ -2,10 +2,29 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Validator;
 
+use GeminiLabs\SiteReviews\Defaults\CaptchaConfigDefaults;
 use GeminiLabs\SiteReviews\Modules\Captcha;
 
-class FriendlyCaptchaValidator extends CaptchaValidator
+class FriendlycaptchaValidator extends CaptchaValidatorAbstract
 {
+    /**
+     * @see https://docs.friendlycaptcha.com/
+     */
+    public function config(): array
+    {
+        return glsr(CaptchaConfigDefaults::class)->merge([
+            'class' => glsr_get_option('forms.captcha.theme').' frc-captcha',
+            'language' => $this->getLocale(),
+            'sitekey' => $this->siteKey(),
+            'theme' => glsr_get_option('forms.captcha.theme'),
+            'type' => 'friendlycaptcha',
+            'urls' => [ // order is intentional, module should always load first
+                'module' => 'https://unpkg.com/friendly-challenge@0.9.4/widget.module.min.js',
+                'nomodule' => 'https://unpkg.com/friendly-challenge@0.9.4/widget.min.js',
+            ],
+        ]);
+    }
+
     public function isEnabled(): bool
     {
         return glsr(Captcha::class)->isEnabled('friendlycaptcha');
@@ -14,8 +33,8 @@ class FriendlyCaptchaValidator extends CaptchaValidator
     protected function data(): array
     {
         return [
-            'secret' => glsr_get_option('forms.friendlycaptcha.secret'),
-            'sitekey' => glsr_get_option('forms.friendlycaptcha.key'),
+            'secret' => $this->siteSecret(),
+            'sitekey' => $this->siteKey(),
             'solution' => $this->token(),
         ];
     }
@@ -36,7 +55,7 @@ class FriendlyCaptchaValidator extends CaptchaValidator
 
     protected function errors(array $errors): array
     {
-        if (empty(glsr_get_option('forms.friendlycaptcha.key'))) {
+        if (empty($this->siteKey())) {
             $errors[] = 'sitekey_missing';
         } elseif ('sitekey_invalid' === $this->token()) {
             $errors[] = 'sitekey_invalid';
@@ -44,7 +63,17 @@ class FriendlyCaptchaValidator extends CaptchaValidator
         return parent::errors($errors);
     }
 
-    protected function siteverifyUrl(): string
+    protected function siteKey(): string
+    {
+        return glsr_get_option('forms.friendlycaptcha.key');
+    }
+
+    protected function siteSecret(): string
+    {
+        return glsr_get_option('forms.friendlycaptcha.secret');
+    }
+
+    protected function siteVerifyUrl(): string
     {
         return 'https://api.friendlycaptcha.com/api/v1/siteverify';
     }

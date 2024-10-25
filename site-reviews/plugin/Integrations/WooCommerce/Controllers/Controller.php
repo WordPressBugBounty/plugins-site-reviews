@@ -6,6 +6,7 @@ use GeminiLabs\SiteReviews\Controllers\AbstractController;
 use GeminiLabs\SiteReviews\Gatekeeper;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Modules\Html\Template;
+use GeminiLabs\SiteReviews\Modules\Migrate;
 
 class Controller extends AbstractController
 {
@@ -17,6 +18,30 @@ class Controller extends AbstractController
         if (class_exists('Automattic\WooCommerce\Utilities\FeaturesUtil')) {
             \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', glsr()->file, true);
         }
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     *
+     * @filter site-reviews/option/addon/woocommerce/enabled
+     * @filter site-reviews/option/addon/woocommerce/style
+     * @filter site-reviews/option/addon/woocommerce/summary
+     * @filter site-reviews/option/addon/woocommerce/reviews
+     * @filter site-reviews/option/addon/woocommerce/form
+     * @filter site-reviews/option/addon/woocommerce/sorting
+     * @filter site-reviews/option/addon/woocommerce/display_empty
+     * @filter site-reviews/option/addon/woocommerce/wp_comments
+     */
+    public function filterOrphanedOptions($value, array $settings, string $path)
+    {
+        $pendingMigrations = glsr(Migrate::class)->pendingMigrations();
+        if (!in_array('Migrate_7_2_0', $pendingMigrations)) {
+            $path = str_replace('addons.', 'integrations.', $path);
+            return Arr::get($settings, $path);
+        }
+        return $value;
     }
 
     /**
@@ -32,9 +57,9 @@ class Controller extends AbstractController
      */
     public function filterSettingsCallback(array $settings, array $input): array
     {
-        $enabled = Arr::get($input, 'settings.addons.woocommerce.enabled');
+        $enabled = Arr::get($input, 'settings.integrations.woocommerce.enabled');
         if ('yes' === $enabled && !$this->gatekeeper()->allows()) { // this renders any error notices
-            $settings = Arr::set($settings, 'settings.addons.woocommerce.enabled', 'no');
+            $settings = Arr::set($settings, 'settings.integrations.woocommerce.enabled', 'no');
         }
         $shortcodes = [
             'form' => 'site_reviews_form',
@@ -42,7 +67,7 @@ class Controller extends AbstractController
             'summary' => 'site_reviews_summary',
         ];
         foreach ($shortcodes as $key => $shortcode) {
-            $path = "settings.addons.woocommerce.{$key}";
+            $path = "settings.integrations.woocommerce.{$key}";
             $value = Arr::get($input, $path);
             if (1 !== preg_match("/^\[{$shortcode}(\s[^\]]*\]|\])$/", $value)) {
                 continue;
@@ -56,7 +81,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @filter site-reviews/addon/subsubsub
+     * @filter site-reviews/integration/subsubsub
      */
     public function filterSubsubsub(array $subsubsub): array
     {
@@ -69,7 +94,7 @@ class Controller extends AbstractController
      */
     public function renderNotice(): void
     {
-        if (glsr_get_option('addons.woocommerce.enabled', false, 'bool')) {
+        if (glsr_get_option('integrations.woocommerce.enabled', false, 'bool')) {
             $this->gatekeeper()->allows(); // this renders any error notices
         }
     }

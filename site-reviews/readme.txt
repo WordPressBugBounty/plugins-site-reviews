@@ -2,8 +2,8 @@
 Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
-Tested up to: 6.6
-Stable tag: 7.1.1
+Tested up to: 6.7
+Stable tag: 7.2.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -60,7 +60,7 @@ https://www.youtube.com/watch?v=H5HdMCXvuq8
 - __Review Limits__: Prevent people from submitting more than one review per day (based on IP address, email, or username). Works with review assignments. 
 - __Shortcodes__: Configurable shortcodes complete with full documentation
 - __Slack Integration__: Receive notifications in Slack when a review is submitted
-- __SPAM Protection__: Includes 5 layers of protection from spam! Built-in Honeypot, 5 CAPTCHA options (Cloudflare Turnstile, FriendlyCaptcha, hCaptcha, reCAPTCHA v2 Invisible, and reCAPTCHA v3), Akismet, Blacklist, and Review limits
+- __SPAM Protection__: Includes 5 layers of protection from spam! Built-in Honeypot, 6 CAPTCHA options (Cloudflare Turnstile, FriendlyCaptcha, hCaptcha, Procaptcha, reCAPTCHA v2 Invisible, and reCAPTCHA v3), Akismet, Blacklist, and Review limits
 - __Templates__: Use the Site Reviews templates in your theme for full control over the HTML
 - __Translations__: Easily change any text of the plugin to your own in the settings.
 - __Verify Reviews__: Automatically request verification of new reviews
@@ -84,6 +84,8 @@ Site Reviews is officially compatible with the following plugins:
 
 - [Akismet](https://wordpress.org/plugins/akismet/)
 - [Avada Fusion Builder](https://avada.com/)
+- [BuddyBoss](https://www.buddyboss.com/)
+- [BuddyPress](https://buddypress.org/)
 - [Divi](https://www.elegantthemes.com/gallery/divi/)
 - [Elementor](https://elementor.com/)
 - [Endurance Cache](https://github.com/bluehost/endurance-page-cache/)
@@ -193,6 +195,18 @@ You can report any security bugs found in the source code of this plugin through
 This update requires a minimum of PHP 7.4 and WordPress 6.1. There are a few potentially breaking changes, so please make sure to read the plugin's changelog and Upgrade Guide after updating.
 
 == Changelog ==
+
+= 7.2.1 (2024-10-24) =
+
+- Added global color support to the Elementor widgets.
+- Added [Prosopo Procaptcha](https://prosopo.io/) integration.
+- Added [Ultimate Member](https://ultimatemember.com/) integration.
+- Added support for Range fields ([Review Forms](https://niftyplugins.com/plugins/site-reviews-forms/) addon required).
+- Added support for responsive custom fields ([Review Forms](https://niftyplugins.com/plugins/site-reviews-forms/) addon required).
+- Fixed compatibility with WooCommerce block themes.
+- Fixed license key masking when an addon is deactivated.
+- Fixed responsive setting fields.
+- Fixed WooCommerce product rating counts when using the Import Product Reviews tool to revert a product ratings migration.
 
 = 7.1.1 (2024-09-27) =
 

@@ -20,9 +20,12 @@ class Hooks extends AbstractHooks
             ['filterElementorPublicInlineScript', 'site-reviews/enqueue/public/inline-script/after', 1],
             ['filterElementorStarRatingDefaults', 'site-reviews/defaults/star-rating/defaults'],
             ['filterGeneratedSchema', 'site-reviews/schema/generate'],
+            ['parseElementCss', 'elementor/element/parse_css', 10, 2],
             ['registerElementorCategory', 'elementor/elements/categories_registered'],
             ['registerElementorWidgets', 'elementor/widgets/register'],
             ['registerInlineStyles', 'elementor/editor/after_enqueue_styles'],
+            ['registerInlineStyles', 'elementor/preview/enqueue_styles'],
+            ['registerScripts', 'elementor/editor/after_enqueue_scripts'],
         ]);
     }
 

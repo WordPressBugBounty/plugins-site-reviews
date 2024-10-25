@@ -44,11 +44,15 @@ class ProductController implements ControllerContract
      */
     public function filterGetRatingHtml($html, $rating, $count): string
     {
+        if (str_contains($html, 'wc-block')) {
+            $html = str_replace('wc-block-grid__product-rating__stars', '', $html);
+            return $html;
+        }
         $starsHtml = glsr_star_rating($rating, $count, [
-            'theme' => glsr_get_option('addons.woocommerce.style'),
+            'theme' => glsr_get_option('integrations.woocommerce.style'),
         ]);
         return glsr(Builder::class)->div([
-            'class' => 'glsr glsr-'.glsr(Style::class)->styleClasses(),
+            'class' => glsr(Style::class)->styleClasses(),
             'text' => $starsHtml,
         ]);
     }
@@ -63,7 +67,7 @@ class ProductController implements ControllerContract
     public function filterGetStarRatingHtml($html, $rating, $count): string
     {
         return glsr_star_rating($rating, $count, [
-            'theme' => glsr_get_option('addons.woocommerce.style'),
+            'theme' => glsr_get_option('integrations.woocommerce.style'),
         ]);
     }
 
@@ -111,7 +115,7 @@ class ProductController implements ControllerContract
         if ('rating' !== $orderby) {
             return $metaQuery;
         }
-        if ('bayesian' === glsr_get_option('addons.woocommerce.sorting')) {
+        if ('bayesian' === glsr_get_option('integrations.woocommerce.sorting')) {
             $metaQuery[] = $this->buildMetaQuery('glsr_ranking', CountManager::META_RANKING);
             $wp_query->set('orderby', ['glsr_ranking' => 'DESC']);
         } else {
@@ -236,7 +240,7 @@ class ProductController implements ControllerContract
     public function filterWidgetArgsTopRatedProducts($args): array
     {
         $args = Arr::consolidate($args);
-        if ('bayesian' === glsr_get_option('addons.woocommerce.sorting')) {
+        if ('bayesian' === glsr_get_option('integrations.woocommerce.sorting')) {
             $args['meta_query'][] = $this->buildMetaQuery('glsr_ranking', CountManager::META_RANKING);
             $args['orderby'] = ['glsr_ranking' => 'DESC'];
         } else {
@@ -281,7 +285,7 @@ class ProductController implements ControllerContract
         if (empty($metaQuery)) {
             $metaQuery = [];
         }
-        if ('bayesian' === glsr_get_option('addons.woocommerce.sorting')) {
+        if ('bayesian' === glsr_get_option('integrations.woocommerce.sorting')) {
             $metaQuery[] = $this->buildMetaQuery('glsr_ranking', CountManager::META_RANKING);
             $query->set('meta_query', $metaQuery);
             $query->set('orderby', ['glsr_ranking' => 'DESC']);
@@ -334,14 +338,14 @@ class ProductController implements ControllerContract
             return;
         }
         $ratings = glsr_get_ratings(['assigned_posts' => 'post_id']);
-        if (0 >= $ratings->average && 'no' === glsr_get_option('addons.woocommerce.display_empty')) {
+        if (0 >= $ratings->average && !glsr_get_option('integrations.woocommerce.display_empty', false, 'bool')) {
             return;
         }
         glsr(Template::class)->render('templates/woocommerce/loop/rating', [
             'product' => $product,
             'ratings' => $ratings,
-            'style' => 'glsr glsr-'.glsr(Style::class)->styleClasses(),
-            'theme' => glsr_get_option('addons.woocommerce.style'),
+            'style' => glsr(Style::class)->styleClasses(),
+            'theme' => glsr_get_option('integrations.woocommerce.style'),
         ]);
     }
 
@@ -395,14 +399,14 @@ class ProductController implements ControllerContract
     {
         global $product;
         $ratings = glsr_get_ratings(['assigned_posts' => 'post_id']);
-        if (0 >= $ratings->average && 'no' === glsr_get_option('addons.woocommerce.display_empty')) {
+        if (0 >= $ratings->average && !glsr_get_option('integrations.woocommerce.display_empty', false, 'bool')) {
             return;
         }
         glsr(Template::class)->render('templates/woocommerce/rating', [
             'product' => $product,
             'ratings' => $ratings,
-            'style' => 'glsr glsr-'.glsr(Style::class)->styleClasses(),
-            'theme' => glsr_get_option('addons.woocommerce.style'),
+            'style' => glsr(Style::class)->styleClasses(),
+            'theme' => glsr_get_option('integrations.woocommerce.style'),
         ]);
     }
 
@@ -471,7 +475,7 @@ class ProductController implements ControllerContract
         if ($override = $product->get_meta($shortcodes[$key])) {
             return $override;
         }
-        return glsr_get_option("addons.woocommerce.{$key}");
+        return glsr_get_option("integrations.woocommerce.{$key}");
     }
 
     /**

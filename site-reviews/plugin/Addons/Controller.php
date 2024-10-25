@@ -19,8 +19,6 @@ use GeminiLabs\SiteReviews\Role;
 
 abstract class Controller extends AbstractController
 {
-    abstract public function app(): PluginContract;
-
     /**
      * @action admin_enqueue_scripts
      */
@@ -175,6 +173,15 @@ abstract class Controller extends AbstractController
             'context' => Cast::toString($context),
             'single' => Cast::toString($single),
         ]);
+    }
+
+    /**
+     * @filter site-reviews/enqueue/public/localize
+     */
+    public function filterLocalizedPublicVariables(array $variables): array
+    {
+        $variables['addons'][$this->app()->id] = null;
+        return $variables;
     }
 
     /**
