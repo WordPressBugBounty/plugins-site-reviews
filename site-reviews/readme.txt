@@ -3,7 +3,7 @@ Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
 Tested up to: 6.7
-Stable tag: 7.2.3
+Stable tag: 7.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -195,6 +195,21 @@ You can report any security bugs found in the source code of this plugin through
 This update requires a minimum of PHP 7.4 and WordPress 6.1. There are a few potentially breaking changes, so please make sure to read the plugin's changelog and Upgrade Guide after updating.
 
 == Changelog ==
+
+= 7.2.4 (2025-02-11) =
+
+- Fixed a PHP notice that could be triggered when other plugins use the gettext_default filter hook incorrectly.
+- Fixed a PHP notice that could be triggered when other plugins use the the_editor filter hook incorrectly.
+- Fixed a XSS vulnerability in the review form.
+- Fixed mimetype checking for some server configurations.
+- Fixed the "Delete data on uninstall" setting.
+- Fixed the documentation for the `glsr_get_ratings` function.
+- Fixed the `glsr_update_review` function to allow updating assigned_terms.
+- Fixed the form signature validator when hooks are used to modify the request before a review is created.
+- Fixed the Friendlycaptcha validator.
+- Fixed the number of stars in the rating field when an invalid text translation is used.
+- Fixed the Settings defaults fallback.
+- Fixed the Site Reviews > Tools page from throwing an error when the WordPress Site Health > Info page crashes (this can happen on a misconfigured server or a server which runs out of available processes).
 
 = 7.2.3 (2024-10-31) =
 
