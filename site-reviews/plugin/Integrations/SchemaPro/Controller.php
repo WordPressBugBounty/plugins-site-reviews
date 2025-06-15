@@ -5,7 +5,6 @@ namespace GeminiLabs\SiteReviews\Integrations\SchemaPro;
 use GeminiLabs\SiteReviews\Controllers\AbstractController;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Modules\Schema;
-use GeminiLabs\SiteReviews\Modules\SchemaParser;
 use GeminiLabs\SiteReviews\Review;
 
 class Controller extends AbstractController
@@ -33,15 +32,14 @@ class Controller extends AbstractController
         if (empty($data) || !empty($data['custom-markup'])) {
             return $data; // don't integrate with the custom markup option
         }
-        $this->generateSchema();
-        $schemas = glsr()->filterArray('schema/all', glsr()->retrieve('schemas', []));
-        if (empty($schemas)) {
+        $schema = glsr(Schema::class)->generate();
+        if (empty($schema)) {
             return $data;
         }
-        if ($rating = Arr::get($schemas, '0.aggregateRating')) {
+        if ($rating = Arr::get($schema, 'aggregateRating')) {
             $data['aggregateRating'] = $rating;
         }
-        if ($review = Arr::get($schemas, '0.review')) {
+        if ($review = Arr::get($schema, 'review')) {
             $data['review'] = $review;
         }
         return $data;
@@ -70,15 +68,6 @@ class Controller extends AbstractController
         if ($oldIntegration !== $newIntegration) {
             global $wpdb;
             $wpdb->delete($wpdb->postmeta, ['meta_key' => BSF_AIOSRS_PRO_CACHE_KEY]);
-        }
-    }
-
-    protected function generateSchema(): void
-    {
-        if (empty(glsr()->retrieve('schemas', []))) {
-            glsr(Schema::class)->store(
-                glsr(SchemaParser::class)->generate()
-            );
         }
     }
 }

@@ -6,7 +6,6 @@ use GeminiLabs\SiteReviews\Controllers\AbstractController;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Integrations\RankMath\Defaults\RatingSchemaTypeDefaults;
 use GeminiLabs\SiteReviews\Modules\Schema;
-use GeminiLabs\SiteReviews\Modules\SchemaParser;
 
 class Controller extends AbstractController
 {
@@ -43,9 +42,8 @@ class Controller extends AbstractController
     public function filterSchemas($data): array
     {
         $data = Arr::consolidate($data);
-        $this->generateSchema();
-        $schemas = glsr()->filterArray('schema/all', glsr()->retrieve('schemas', []));
-        if (empty($schemas)) {
+        $schema = glsr(Schema::class)->generate();
+        if (empty($schema)) {
             return $data;
         }
         $allowedTypes = glsr(RatingSchemaTypeDefaults::class)->defaults();
@@ -53,8 +51,8 @@ class Controller extends AbstractController
             if (!in_array(Arr::get($values, '@type'), $allowedTypes)) {
                 continue;
             }
-            $aggregateRatingSchema = Arr::get($schemas, '0.aggregateRating');
-            $reviewSchema = Arr::get($schemas, '0.review');
+            $aggregateRatingSchema = Arr::get($schema, 'aggregateRating');
+            $reviewSchema = Arr::get($schema, 'review');
             if ($aggregateRatingSchema) {
                 $data[$key]['aggregateRating'] = $aggregateRatingSchema;
             }
@@ -63,14 +61,5 @@ class Controller extends AbstractController
             }
         }
         return $data;
-    }
-
-    protected function generateSchema(): void
-    {
-        if (empty(glsr()->retrieve('schemas', []))) {
-            glsr(Schema::class)->store(
-                glsr(SchemaParser::class)->generate()
-            );
-        }
     }
 }

@@ -113,16 +113,17 @@ class Gatekeeper
 
     protected function pluginData(string $plugin): array
     {
-        $plugins = $this->isPluginInstalled($plugin)
-            ? $this->plugins()
-            : $this->dependencies;
+        $plugins = $this->plugins();
+        if (!array_key_exists($plugin, $plugins)) {
+            $plugins = $this->dependencies;
+        }
         if (!empty($plugins[$plugin])) {
             $data = $plugins[$plugin];
             $data['plugin'] = $plugin;
             $data['slug'] = substr($plugin, 0, strrpos($plugin, '/'));
             return array_change_key_case($data, CASE_LOWER);
         }
-        glsr_log()->error(sprintf('Plugin information not found for: %s', $plugin));
+        glsr_log()->error("Plugin information not found for: {$plugin}");
         return [];
     }
 

@@ -5,7 +5,6 @@ namespace GeminiLabs\SiteReviews\Integrations\SASWP;
 use GeminiLabs\SiteReviews\Controllers\AbstractController;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Modules\Schema;
-use GeminiLabs\SiteReviews\Modules\SchemaParser;
 
 class Controller extends AbstractController
 {
@@ -17,13 +16,12 @@ class Controller extends AbstractController
     public function filterSchema($data): array
     {
         $data = Arr::consolidate($data);
-        $this->generateSchema();
-        $schemas = glsr()->filterArray('schema/all', glsr()->retrieve('schemas', []));
-        if (empty($schemas)) {
+        $schema = glsr(Schema::class)->generate();
+        if (empty($schema)) {
             return $data;
         }
-        $aggregateRating = Arr::get($schemas, '0.aggregateRating');
-        $review = Arr::get($schemas, '0.review');
+        $aggregateRating = Arr::get($schema, 'aggregateRating');
+        $review = Arr::get($schema, 'review');
         if (in_array(Arr::get($data, '@type'), ['Review', 'ReviewNewsArticle'])) {
             if (!empty($aggregateRating)) {
                 $data['itemReviewed']['aggregateRating'] = $aggregateRating;
@@ -40,14 +38,5 @@ class Controller extends AbstractController
             }
         }
         return $data;
-    }
-
-    protected function generateSchema(): void
-    {
-        if (empty(glsr()->retrieve('schemas', []))) {
-            glsr(Schema::class)->store(
-                glsr(SchemaParser::class)->generate()
-            );
-        }
     }
 }

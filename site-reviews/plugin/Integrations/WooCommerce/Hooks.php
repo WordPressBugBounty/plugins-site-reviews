@@ -80,6 +80,7 @@ class Hooks extends AbstractHooks
             ['filterProductCommentStatus', 'get_default_comment_status', 10, 3],
             ['filterProductSettings', 'woocommerce_get_settings_products', 10, 2],
             ['filterPublicInlineScript', 'site-reviews/enqueue/public/inline-script/after'],
+            ['filterRankmathSchema', 'site-reviews/schema/generate', 10, 2],
             ['filterRatingOption', 'option_woocommerce_enable_review_rating'],
             ['filterRatingOption', 'option_woocommerce_review_rating_required'],
             ['filterReviewAuthorTagValue', 'site-reviews/review/value/author', 10, 2],
