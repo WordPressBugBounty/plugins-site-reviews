@@ -1,11 +1,14 @@
 == Changelog ==
 
+= 7.2.10 (2025-06-25) =
+
+- Fixed button width
+
 = 7.2.9 (2025-06-15) =
 
 - Fixed blacklist
 - Fixed integration check
 - Fixed schema integrations with shortcode-based page builders
-- Version 8.0 is coming soon...
 
 = 7.2.7 (2025-06-05) =
 

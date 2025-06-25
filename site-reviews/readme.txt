@@ -3,7 +3,7 @@ Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
 Tested up to: 6.8
-Stable tag: 7.2.9
+Stable tag: 7.2.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -196,12 +196,15 @@ This update requires a minimum of PHP 7.4 and WordPress 6.1. There are a few pot
 
 == Changelog ==
 
+= 7.2.10 (2025-06-25) =
+
+- Fixed button width
+
 = 7.2.9 (2025-06-15) =
 
 - Fixed blacklist
 - Fixed integration check
 - Fixed schema integrations with shortcode-based page builders
-- Version 8.0 is coming soon...
 
 = 7.2.7 (2025-06-05) =
 
