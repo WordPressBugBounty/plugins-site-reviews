@@ -14,7 +14,7 @@ class SchemaParser
     {
         $shortcode = glsr(SiteReviewsShortcode::class)->normalize($args);
         $reviews = glsr(ReviewManager::class)->reviews($shortcode->args);
-        return glsr(Schema::class)->buildSummary($shortcode->args, $reviews);
+        return glsr(Schema::class)->build($shortcode->args, $reviews);
     }
 
     public function buildSummarySchema(array $args): array
