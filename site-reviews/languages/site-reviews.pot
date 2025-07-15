@@ -1886,15 +1886,15 @@ msgctxt "admin-text"
 msgid "The <code>%s</code> table was successly converted to InnoDB."
 msgstr ""
 
-#: plugin/Commands/CreateReview.php:162, views/pages/documentation/support/common-problems-and-solutions.php:95
+#: plugin/Commands/CreateReview.php:167, views/pages/documentation/support/common-problems-and-solutions.php:95
 msgid "Your review could not be submitted and the error has been logged. Please notify the site administrator."
 msgstr ""
 
-#: plugin/Commands/CreateReview.php:166
+#: plugin/Commands/CreateReview.php:171
 msgid "Your review has been submitted!"
 msgstr ""
 
-#: plugin/Commands/CreateReview.php:167
+#: plugin/Commands/CreateReview.php:172
 msgid "Your review has been submitted and is pending approval."
 msgstr ""
 
@@ -2096,7 +2096,7 @@ msgctxt "admin-text"
 msgid "No reviews were found to export."
 msgstr ""
 
-#: plugin/Commands/ImportReviews.php:31, plugin/Integrations/WooCommerce/Commands/ImportProductReviews.php:56
+#: plugin/Commands/ImportReviews.php:31, plugin/Integrations/WooCommerce/Commands/ImportProductReviews.php:58
 msgctxt "admin-text"
 msgid "Imported %d of %d reviews"
 msgstr ""
@@ -5803,12 +5803,12 @@ msgctxt "admin-text"
 msgid "Migrated the product ratings."
 msgstr ""
 
-#: plugin/Integrations/WooCommerce/Controllers/MainController.php:73
+#: plugin/Integrations/WooCommerce/Controllers/MainController.php:92
 msgctxt "admin-text"
 msgid "managed by Site Reviews"
 msgstr ""
 
-#: plugin/Integrations/WooCommerce/Controllers/MainController.php:121
+#: plugin/Integrations/WooCommerce/Controllers/MainController.php:152
 msgid "verified owner"
 msgstr ""
 

@@ -13,7 +13,14 @@ use GeminiLabs\SiteReviews\Review;
 
 class MainController extends AbstractController
 {
-    public const VERIFIED_META_KEY = '_verified';
+    /**
+     * @action admin_enqueue_scripts
+     */
+    public function enqueueInlineAdminStyles(): void
+    {
+        $css = '.woocommerce-review-activity-card .woocommerce-activity-card__actions button.is-tertiary:not(.is-destructive) {display:none}';
+        wp_add_inline_style('wc-admin-app', $css);
+    }
 
     /**
      * @filter site-reviews/enqueue/public/inline-styles
@@ -34,6 +41,16 @@ class MainController extends AbstractController
         $css = str_replace('assets/images/stars/default/', "assets/images/stars/{$style}/", $css);
         $css .= ".glsr:not([data-theme]) .glsr-bar-background-percent{--glsr-bar-bg:{$colors[$style]};}";
         return $css;
+    }
+
+    /**
+     * @return int
+     *
+     * @filter woocommerce_product_reviews_pending_count
+     */
+    public function filterMenuPendingCount()
+    {
+        return 0;
     }
 
     /**
@@ -91,10 +108,10 @@ class MainController extends AbstractController
     /**
      * @filter site-reviews/schema/generate
      */
-    public function filterRankmathSchema(array $data, SchemaParser $parser): array
+    public function filterRankmathSchemaPreview(array $data, SchemaParser $parser): array
     {
         if (!did_action('rank_math/json_ld/preview')) {
-            return $data;
+            return $data; // only run this for the preview
         }
         if (!$url = wp_get_referer()) {
             return $data;
@@ -125,19 +142,6 @@ class MainController extends AbstractController
     }
 
     /**
-     * @return \WC_Product|false
-     *
-     * @filter site-reviews/review/call/product
-     */
-    public function filterReviewProductMethod(Review $review)
-    {
-        if ($product = wc_get_product(Arr::get($review->assigned_posts, 0))) {
-            return $product;
-        }
-        return false;
-    }
-
-    /**
      * @param \GeminiLabs\SiteReviews\Modules\Html\Tags\ReviewAuthorTag $tag
      *
      * @filter site-reviews/review/value/author
@@ -154,12 +158,52 @@ class MainController extends AbstractController
     /**
      * @filter site-reviews/review/call/hasVerifiedOwner
      */
-    public function hasVerifiedOwner(Review $review): bool
+    public function filterReviewCallbackHasVerifiedOwner(Review $review): bool
     {
-        $verified = get_post_meta($review->ID, static::VERIFIED_META_KEY, true);
-        return '' === $verified
-            ? $this->verifyProductOwner($review)
-            : (bool) $verified;
+        $verified = get_post_meta($review->ID, '_verified', true);
+        if ('' !== $verified) {
+            return (bool) $verified;
+        }
+        $review->refresh(); // refresh the review first!
+        $verified = false;
+        foreach ($review->assigned_posts as $postId) {
+            if ('product' === get_post_type($postId)) {
+                $verified = wc_customer_bought_product($review->email, $review->author_id, $postId);
+                break; // only check the first product
+            }
+        }
+        update_post_meta($review->ID, '_verified', (int) $verified);
+        return $verified;
+    }
+
+    /**
+     * @filter site-reviews/review/call/product
+     */
+    public function filterReviewCallbackProduct(Review $review): ?\WC_Product
+    {
+        foreach ($review->assigned_posts as $postId) {
+            if ('product' !== get_post_type($postId)) {
+                continue;
+            }
+            if ($product = wc_get_product($postId)) {
+                return $product; // only return the first found product
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @action admin_init
+     */
+    public function redirectProductReviews(): void
+    {
+        global $pagenow;
+        if ('edit.php' === $pagenow
+            && 'product' === filter_input(INPUT_GET, 'post_type')
+            && 'product-reviews' === filter_input(INPUT_GET, 'page')) {
+            wp_redirect(add_query_arg('notice', 'product-reviews', glsr_admin_url()), 301);
+            exit;
+        }
     }
 
     /**
@@ -206,30 +250,20 @@ class MainController extends AbstractController
     public function renderNotice(): void
     {
         $screen = glsr_current_screen();
-        if ('product_page_product-reviews' !== $screen->base || 'edit.php?post_type=product' !== Arr::get($screen, 'parent_file')) {
+        if ('edit' !== $screen->base || 'edit-site-review' !== $screen->id) {
+            return;
+        }
+        if ('product-reviews' !== filter_input(INPUT_GET, 'notice')) {
             return;
         }
         glsr()->render('integrations/woocommerce/notices/reviews');
     }
 
     /**
-     * @return void|bool
-     *
-     * @see $this->hasVerifiedOwner()
-     *
      * @action site-reviews/review/created
      */
-    public function verifyProductOwner(Review $review)
+    public function verifyProductOwner(Review $review): void
     {
-        $review->refresh(); // refresh the review first!
-        $verified = false;
-        foreach ($review->assigned_posts as $postId) {
-            if ('product' === get_post_type($postId)) {
-                $verified = wc_customer_bought_product($review->email, $review->author_id, $postId);
-                break;
-            }
-        }
-        update_post_meta($review->ID, static::VERIFIED_META_KEY, (int) $verified);
-        return $verified;
+        $review->hasVerifiedOwner();
     }
 }

@@ -3,7 +3,7 @@ Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
 Tested up to: 6.8
-Stable tag: 7.2.12
+Stable tag: 7.2.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -195,6 +195,12 @@ You can report any security bugs found in the source code of this plugin through
 This update requires a minimum of PHP 7.4 and WordPress 6.1. There are a few potentially breaking changes, so please make sure to read the plugin's changelog and Upgrade Guide after updating.
 
 == Changelog ==
+
+= 7.2.13 (2025-07-15) =
+
+- Fixed Reviews panel on the WooCommerce Home page when the integration is enabled
+- Fixed WooCommerce template override version
+- Updated support for WooCommerce v10
 
 = 7.2.12 (2025-07-03) =
 

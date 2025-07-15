@@ -56,9 +56,14 @@ class Hooks extends AbstractHooks
 
     protected function isEnabled(): bool
     {
-        return 'yes' === $this->option('integrations.woocommerce.enabled')
-            && 'yes' === get_option('woocommerce_enable_reviews', 'yes')
-            && class_exists('WooCommerce')
+        return $this->isInstalled()
+            && 'yes' === $this->option('integrations.woocommerce.enabled')
+            && 'yes' === get_option('woocommerce_enable_reviews', 'yes');
+    }
+
+    protected function isInstalled(): bool
+    {
+        return class_exists('WooCommerce')
             && function_exists('WC');
     }
 
@@ -76,16 +81,19 @@ class Hooks extends AbstractHooks
         remove_action('wp_update_comment_count', ['WC_Comments', 'clear_transients'], 10);
         remove_filter('comments_open', ['WC_Comments', 'comments_open'], 10);
         return [
+            ['enqueueInlineAdminStyles', 'admin_enqueue_scripts', 20],
             ['filterInlineStyles', 'site-reviews/enqueue/public/inline-styles', 20],
+            ['filterMenuPendingCount', 'woocommerce_product_reviews_pending_count'],
             ['filterProductCommentStatus', 'get_default_comment_status', 10, 3],
             ['filterProductSettings', 'woocommerce_get_settings_products', 10, 2],
             ['filterPublicInlineScript', 'site-reviews/enqueue/public/inline-script/after'],
-            ['filterRankmathSchema', 'site-reviews/schema/generate', 10, 2],
+            ['filterRankmathSchemaPreview', 'site-reviews/schema/generate', 10, 2],
             ['filterRatingOption', 'option_woocommerce_enable_review_rating'],
             ['filterRatingOption', 'option_woocommerce_review_rating_required'],
             ['filterReviewAuthorTagValue', 'site-reviews/review/value/author', 10, 2],
-            ['filterReviewProductMethod', 'site-reviews/review/call/product'],
-            ['hasVerifiedOwner', 'site-reviews/review/call/hasVerifiedOwner'],
+            ['filterReviewCallbackHasVerifiedOwner', 'site-reviews/review/call/hasVerifiedOwner'],
+            ['filterReviewCallbackProduct', 'site-reviews/review/call/product'],
+            ['redirectProductReviews', 'admin_init'],
             ['registerElementorWidgets', 'elementor/widgets/register', 20],
             ['registerWidgets', 'widgets_init', 20],
             ['removeWoocommerceReviews', 'woocommerce_register_post_type_product'],
@@ -106,7 +114,7 @@ class Hooks extends AbstractHooks
             ['filterProductPostClauses', 'woocommerce_get_catalog_ordering_args', 20, 2],
             ['filterProductRatingCounts', 'woocommerce_product_get_rating_counts', 10, 2],
             ['filterProductReviewCount', 'woocommerce_product_get_review_count', 10, 2],
-            ['filterProductTabs', 'woocommerce_product_tabs'],
+            ['filterProductTabs', 'woocommerce_product_tabs', 50],
             ['filterProductTaxQuery', 'woocommerce_product_query_tax_query', 20],
             ['filterStructuredData', 'woocommerce_structured_data_product', 10, 2],
             ['filterWidgetArgsTopRatedProducts', 'woocommerce_top_rated_products_widget_args'],

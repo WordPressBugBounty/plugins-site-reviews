@@ -92,7 +92,7 @@ msgstr "This review is based on my own experience and is my genuine opinion."
 msgid "Show more"
 msgstr "Show more"
 
-#: plugin/Commands/CreateReview.php:162, views/pages/documentation/support/common-problems-and-solutions.php:95
+#: plugin/Commands/CreateReview.php:167, views/pages/documentation/support/common-problems-and-solutions.php:95
 msgid ""
 "Your review could not be submitted and the error has been logged. Please "
 "notify the site administrator."
@@ -100,11 +100,11 @@ msgstr ""
 "Your review could not be submitted and the error has been logged. Please "
 "notify the site administrator."
 
-#: plugin/Commands/CreateReview.php:166
+#: plugin/Commands/CreateReview.php:171
 msgid "Your review has been submitted!"
 msgstr "Your review has been submitted!"
 
-#: plugin/Commands/CreateReview.php:167
+#: plugin/Commands/CreateReview.php:172
 msgid "Your review has been submitted and is pending approval."
 msgstr "Your review has been submitted and is pending approval."
 
@@ -464,7 +464,7 @@ msgstr "No one has reviewed this person yet."
 msgid "You must be %s to review this person."
 msgstr "You must be %s to review this person."
 
-#: plugin/Integrations/WooCommerce/Controllers/MainController.php:121
+#: plugin/Integrations/WooCommerce/Controllers/MainController.php:152
 msgid "verified owner"
 msgstr "verified owner"
 
@@ -2691,7 +2691,7 @@ msgctxt "admin-text"
 msgid "No reviews were found to export."
 msgstr "No reviews were found to export."
 
-#: plugin/Commands/ImportReviews.php:31, plugin/Integrations/WooCommerce/Commands/ImportProductReviews.php:56
+#: plugin/Commands/ImportReviews.php:31, plugin/Integrations/WooCommerce/Commands/ImportProductReviews.php:58
 msgctxt "admin-text"
 msgid "Imported %d of %d reviews"
 msgstr "Imported %d of %d reviews"
@@ -5782,7 +5782,7 @@ msgctxt "admin-text"
 msgid "Migrated the product ratings."
 msgstr "Migrated the product ratings."
 
-#: plugin/Integrations/WooCommerce/Controllers/MainController.php:73
+#: plugin/Integrations/WooCommerce/Controllers/MainController.php:92
 msgctxt "admin-text"
 msgid "managed by Site Reviews"
 msgstr "managed by Site Reviews"

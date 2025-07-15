@@ -1,5 +1,11 @@
 == Changelog ==
 
+= 7.2.13 (2025-07-15) =
+
+- Fixed Reviews panel on the WooCommerce Home page when the integration is enabled
+- Fixed WooCommerce template override version
+- Updated support for WooCommerce v10
+
 = 7.2.12 (2025-07-03) =
 
 - Fixed Rankmath integration
