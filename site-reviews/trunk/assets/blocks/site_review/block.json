@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "site-reviews/review",
+  "title": "Single Review",
+  "category": "site-reviews",
+  "description": "Display a single review.",
+  "keywords": [
+    "review",
+    "site reviews"
+  ],
+  "version": "2.0.0",
+  "textdomain": "site-reviews",
+  "attributes": {
+    "className": {
+      "default": "",
+      "type": "string"
+    },
+    "hide": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "default": "",
+      "type": "string"
+    },
+    "post_id": {
+      "default": "",
+      "type": "string"
+    },
+    "style": {
+      "type": "object",
+      "default": {
+        "typography": {
+          "textAlign": "left"
+        }
+      }
+    },
+    "style_rating_color": {
+      "default": "",
+      "type": "string"
+    },
+    "style_rating_color_custom": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "supports": {
+    "color": {
+      "background": false,
+      "button": false,
+      "enableContrastChecker": true,
+      "heading": true,
+      "link": true,
+      "text": true
+    },
+    "html": false,
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "textAlign": true,
+      "__experimentalTextDecoration": false,
+      "__experimentalFontFamily": true,
+      "__experimentalFontWeight": true,
+      "__experimentalFontStyle": true,
+      "__experimentalTextTransform": false,
+      "__experimentalLetterSpacing": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true,
+        "lineHeight": true
+      }
+    }
+  },
+  "example": {},
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": [],
+  "script": [
+    "site-reviews"
+  ],
+  "style": [
+    "file:./style-index.css",
+    "site-reviews"
+  ]
+}

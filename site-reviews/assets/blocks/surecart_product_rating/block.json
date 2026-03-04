@@ -1,0 +1,105 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "site-reviews/surecart-product-rating",
+  "title": "Product Rating",
+  "category": "surecart-product-page",
+  "ancestor": [
+    "surecart/product-page",
+    "surecart/product-template",
+    "surecart/upsell"
+  ],
+  "description": "Display the product rating.",
+  "keywords": [
+    "site reviews"
+  ],
+  "version": "1.0.0",
+  "textdomain": "site-reviews",
+  "attributes": {
+    "has_text": {
+      "default": true,
+      "type": "boolean"
+    },
+    "is_link": {
+      "default": false,
+      "type": "boolean"
+    },
+    "link_url": {
+      "attribute": "href",
+      "default": "#product-reviews",
+      "type": "string"
+    },
+    "style": {
+      "type": "object",
+      "default": {
+        "spacing": {
+          "margin": {
+            "bottom": "0",
+            "top": "0"
+          }
+        }
+      }
+    },
+    "style_rating_color": {
+      "default": "",
+      "type": "string"
+    },
+    "style_rating_color_custom": {
+      "default": "",
+      "type": "string"
+    },
+    "text": {
+      "attribute": "title",
+      "default": "{num} customer reviews",
+      "type": "string"
+    }
+  },
+  "usesContext": [
+    "postId"
+  ],
+  "supports": {
+    "interactivity": true,
+    "color": {
+      "background": false,
+      "gradients": false,
+      "link": true,
+      "__experimentalDefaultControls": {
+        "text": true
+      }
+    },
+    "spacing": {
+      "padding": true,
+      "margin": [
+        "top",
+        "bottom"
+      ]
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "textAlign": false,
+      "__experimentalTextDecoration": false,
+      "__experimentalFontFamily": true,
+      "__experimentalFontWeight": true,
+      "__experimentalFontStyle": true,
+      "__experimentalTextTransform": false,
+      "__experimentalLetterSpacing": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true,
+        "lineHeight": true
+      }
+    }
+  },
+  "example": {},
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "viewScriptModule": [
+    "file:./view.js"
+  ],
+  "style": [
+    "file:./style-index.css",
+    "site-reviews"
+  ],
+  "render": "file:./view.php"
+}
