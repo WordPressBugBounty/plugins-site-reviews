@@ -45,9 +45,9 @@ class Module extends DiviModule
      */
     public static function module_styles(array $args): void
     {
-        parent::module_styles($args);
         $args = glsr(ModuleStylesDefaults::class)->merge($args);
         $attrs = $args['attrs'];
+        $baseSelector = '#page-container';
         $elements = $args['elements'];
         $orderClass = $args['orderClass'];
         Style::add([
@@ -64,7 +64,7 @@ class Module extends DiviModule
                                 'componentName' => 'divi/common',
                                 'props' => [
                                     'attr' => $attrs['module']['decoration']['sizing'] ?? [],
-                                    'selector' => "{$args['orderClass']} .glsr",
+                                    'selector' => "{$baseSelector} {$orderClass} .glsr",
                                     'declarationFunction' => function ($args) {
                                         return !empty($args['attrValue']['maxWidth']) ? '--glsr-max-w:none;' : '';
                                     },
@@ -90,7 +90,7 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['design']['decoration']['ratingColor'] ?? [],
                                     'declarationFunction' => StyleDeclarations::color(['--glsr-summary-star-bg']),
-                                    'selector' => "{$orderClass}.has-custom-color .glsr-summary",
+                                    'selector' => "{$baseSelector} {$orderClass}.has-custom-color .glsr-summary",
                                 ],
                             ],
                             [
@@ -99,7 +99,7 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['design']['decoration']['barColor'] ?? [],
                                     'declarationFunction' => StyleDeclarations::color(['--glsr-bar-bg']),
-                                    'selector' => "{$orderClass} .glsr-summary",
+                                    'selector' => "{$baseSelector} {$orderClass} .glsr-summary",
                                 ],
                             ],
                         ],
@@ -107,6 +107,7 @@ class Module extends DiviModule
                 ]),
             ],
         ]);
+        parent::module_styles($args);
     }
 
     public static function shortcodeInstance(): ShortcodeContract

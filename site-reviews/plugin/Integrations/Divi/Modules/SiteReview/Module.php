@@ -35,9 +35,9 @@ class Module extends DiviModule
      */
     public static function module_styles(array $args): void
     {
-        parent::module_styles($args);
         $args = glsr(ModuleStylesDefaults::class)->merge($args);
         $attrs = $args['attrs'];
+        $baseSelector = '#page-container';
         $elements = $args['elements'];
         $orderClass = $args['orderClass'];
         Style::add([
@@ -55,7 +55,7 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['design']['decoration']['ratingColor'] ?? [],
                                     'declarationFunction' => StyleDeclarations::color(['--glsr-review-star-bg']),
-                                    'selector' => "{$orderClass}.has-custom-color .glsr-review",
+                                    'selector' => "{$baseSelector} {$orderClass}.has-custom-color .glsr-review",
                                 ],
                             ],
                         ],
@@ -63,6 +63,7 @@ class Module extends DiviModule
                 ]),
             ],
         ]);
+        parent::module_styles($args);
     }
 
     public static function shortcodeInstance(): ShortcodeContract

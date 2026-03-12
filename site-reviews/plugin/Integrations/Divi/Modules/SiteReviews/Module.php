@@ -35,11 +35,15 @@ class Module extends DiviModule
      */
     public static function module_styles(array $args): void
     {
-        parent::module_styles($args);
         $args = glsr(ModuleStylesDefaults::class)->merge($args);
         $attrs = $args['attrs'];
         $elements = $args['elements'];
         $orderClass = $args['orderClass'];
+
+        $baseSelector = '#page-container';
+        $iconPlacementValue = $attrs['button']['decoration']['button']['desktop']['value']['icon']['placement'] ?? 'right';
+        $iconPlacement = 'left' === $iconPlacementValue ? 'before' : 'after';
+
         Style::add([
             'id' => $args['id'],
             'name' => $args['name'],
@@ -55,7 +59,7 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['design']['decoration']['ratingColor'] ?? [],
                                     'declarationFunction' => StyleDeclarations::color(['--glsr-review-star-bg']),
-                                    'selector' => "{$orderClass}.has-custom-color .glsr-reviews",
+                                    'selector' => "{$baseSelector} {$orderClass}.has-custom-color .glsr-reviews",
                                 ],
                             ],
                         ],
@@ -79,7 +83,16 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['button']['decoration']['button'] ?? [],
                                     'declarationFunction' => StyleDeclarations::buttonAlignment(),
-                                    'selector' => "{$orderClass} .glsr-button_wrapper",
+                                    'selector' => "{$baseSelector} {$orderClass} .glsr-button_wrapper",
+                                ],
+                            ],
+                            [
+                                // Button Icon
+                                'componentName' => 'divi/common',
+                                'props' => [
+                                    'attr' => $attrs['button']['decoration']['button'] ?? [],
+                                    'declarationFunction' => StyleDeclarations::buttonIcon(),
+                                    'selector' => "{$baseSelector} {$orderClass} .glsr-button::{$iconPlacement}",
                                 ],
                             ],
                         ],
@@ -87,6 +100,7 @@ class Module extends DiviModule
                 ]),
             ],
         ]);
+        parent::module_styles($args);
     }
 
     public static function shortcodeInstance(): ShortcodeContract
