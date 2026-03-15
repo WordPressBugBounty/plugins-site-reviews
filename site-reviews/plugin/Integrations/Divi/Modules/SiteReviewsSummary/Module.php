@@ -24,9 +24,11 @@ class Module extends DiviModule
     {
         parent::module_classnames($args);
         $args = glsr(ModuleClassnamesDefaults::class)->merge($args);
-        if (empty($args['attrs']['shortcode']['advanced']['theme']['desktop']['value'])) {
+        $barColor = $args['attrs']['design']['decoration']['barColor']['desktop']['value']['color'] ?? '';
+        $args['classnamesInstance']->add('has-bar-color', !empty($barColor));
+        if (empty($args['attrs']['shortcode']['advanced']['theme']['desktop']['value'])) { // @todo move this "theme" check to Review Themes addon
             $ratingColor = $args['attrs']['design']['decoration']['ratingColor']['desktop']['value']['color'] ?? '';
-            $args['classnamesInstance']->add('has-custom-color', !empty($ratingColor));
+            $args['classnamesInstance']->add('has-rating-color', !empty($ratingColor));
         }
         $alignSelf = $args['attrs']['module']['decoration']['sizing']['desktop']['value']['alignSelf'] ?? null;
         if (!empty($alignSelf)) {
@@ -90,7 +92,10 @@ class Module extends DiviModule
                                 'props' => [
                                     'attr' => $attrs['design']['decoration']['ratingColor'] ?? [],
                                     'declarationFunction' => StyleDeclarations::color(['--glsr-summary-star-bg']),
-                                    'selector' => "{$baseSelector} {$orderClass}.has-custom-color .glsr-summary",
+                                    'selector' => implode(',', [
+                                        "{$baseSelector} {$orderClass}.has-custom-color .glsr-summary", // @todo remove in v8.1
+                                        "{$baseSelector} {$orderClass}.has-rating-color .glsr-summary",
+                                    ]),
                                 ],
                             ],
                             [

@@ -29,8 +29,11 @@ class Controller extends AbstractController
             return $attributes;
         }
         $classes = [$attributes['class'] ?? ''];
+        if (!empty($args['style_bar_color'])) {
+            $classes[] = 'has-bar-color';
+        }
         if (!empty($args['style_rating_color'])) {
-            $classes[] = 'has-custom-color';
+            $classes[] = 'has-rating-color';
         }
         $attributes['class'] = glsr(Sanitizer::class)->sanitizeAttrClass(implode(' ', $classes));
         return $attributes;

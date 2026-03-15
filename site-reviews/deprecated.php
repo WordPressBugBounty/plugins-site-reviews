@@ -3,24 +3,24 @@
 defined('ABSPATH') || exit;
 
 /*
- * Provide support for the deprecated {{ assigned_to }} tag
- * @param string $template
- * @return string
- * @since 5.0
+ * Deprecated since v8.0
  */
-add_filter('site-reviews/build/template/review', function ($template) {
-    return str_replace('{{ assigned_to }}', '{{ assigned_links }}', $template);
-});
-/*
- * Fix the {{ review_id }} tag in the review template which now only returns the ID
- * @param string $template
- * @return string
- * @since 5.3
- */
-add_filter('site-reviews/build/template/review', function ($template) {
-    return str_replace('id="{{ review_id }}"', 'id="review-{{ review_id }}"', $template);
+add_action('plugins_loaded', function () {
+    if (!glsr()->filterBool('support/deprecated/v8', true)) {
+        return;
+    }
+    add_filter('site-reviews/review-form/fields/order', function ($order) {
+        return apply_filters_deprecated('site-reviews/review-form/order',
+            [$order],
+            '8.0',
+            'site-reviews/review-form/fields/order'
+        );
+    });
 });
 
+/*
+ * Deprecated since v7.0
+ */
 add_action('plugins_loaded', function () {
     if (!glsr()->filterBool('support/deprecated/v7', true)) {
         return;
@@ -34,6 +34,9 @@ add_action('plugins_loaded', function () {
     }, 10, 2);
 });
 
+/*
+ * Deprecated since v6.0
+ */
 add_action('plugins_loaded', function () {
     if (!glsr()->filterBool('support/deprecated/v6', true)) {
         return;
@@ -68,10 +71,31 @@ add_action('plugins_loaded', function () {
     });
 });
 
+/*
+ * Deprecated since v5.0
+ */
 add_action('plugins_loaded', function () {
     if (!glsr()->filterBool('support/deprecated/v5', true)) {
         return;
     }
+    /*
+     * Provide support for the deprecated {{ assigned_to }} tag
+     * @param string $template
+     * @return string
+     * @since 5.0
+     */
+    add_filter('site-reviews/build/template/review', function ($template) {
+        return str_replace('{{ assigned_to }}', '{{ assigned_links }}', $template);
+    });
+    /*
+     * Fix the {{ review_id }} tag in the review template which now only returns the ID
+     * @param string $template
+     * @return string
+     * @since 5.3
+     */
+    add_filter('site-reviews/build/template/review', function ($template) {
+        return str_replace('id="{{ review_id }}"', 'id="review-{{ review_id }}"', $template);
+    });
     add_filter('site-reviews/config/forms/review-form', function ($config) {
         return apply_filters_deprecated('site-reviews/config/forms/submission-form',
             [$config],
@@ -87,11 +111,11 @@ add_action('plugins_loaded', function () {
             'Please use a custom "reviews.php" template instead.'
         );
     });
-    add_filter('site-reviews/review-form/order', function ($order) {
+    add_filter('site-reviews/review-form/fields/order', function ($order) {
         return apply_filters_deprecated('site-reviews/submission-form/order',
             [$order],
             '5.0',
-            'site-reviews/review-form/order'
+            'site-reviews/review-form/fields/order'
         );
     }, 9);
     add_filter('site-reviews/defaults/review-table-filters', function ($defaults) {
