@@ -2,13 +2,15 @@
 
 namespace GeminiLabs\SiteReviews\Modules\Validator;
 
+use GeminiLabs\SiteReviews\Api;
 use GeminiLabs\SiteReviews\Helper;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Str;
-use GeminiLabs\SiteReviews\Modules\Captcha;
+use GeminiLabs\SiteReviews\Response;
 
 abstract class CaptchaValidatorAbstract extends ValidatorAbstract
 {
+    public const API_URL = '';
     public const CAPTCHA_DISABLED = 0;
     public const CAPTCHA_EMPTY = 1;
     public const CAPTCHA_FAILED = 2;
@@ -22,11 +24,6 @@ abstract class CaptchaValidatorAbstract extends ValidatorAbstract
     public function isEnabled(): bool
     {
         return false;
-    }
-
-    public function isTokenValid(array $response): bool
-    {
-        return $response['success'];
     }
 
     public function isValid(): bool
@@ -48,11 +45,6 @@ abstract class CaptchaValidatorAbstract extends ValidatorAbstract
             __('The CAPTCHA verification failed, please try again.', 'site-reviews')
         );
         $this->fail($error);
-    }
-
-    protected function data(): array
-    {
-        return [];
     }
 
     protected function errors(array $errors): array
@@ -82,27 +74,33 @@ abstract class CaptchaValidatorAbstract extends ValidatorAbstract
         return glsr()->filterString('captcha/language', $locale);
     }
 
-    protected function makeRequest(array $data): array
+    protected function isTokenValid(array $responseBody): bool
     {
-        $response = wp_remote_post($this->siteVerifyUrl(), [
-            'body' => $data,
-        ]);
-        if (is_wp_error($response)) {
-            glsr_log()->error($response->get_error_message());
-            return [];
-        }
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-        return $this->response($body);
+        return $responseBody['success'];
     }
 
-    protected function response(array $body): array
+    protected function requestArgs(array $body): array
     {
-        $errors = Arr::consolidate(Arr::get($body, 'error-codes', Arr::get($body, 'errors')));
         return [
-            'action' => Arr::get($body, 'action'),
+            'body' => $body,
+            'force' => true,
+        ];
+    }
+
+    protected function requestBody(): array
+    {
+        return [];
+    }
+
+    protected function responseBody(Response $response): array
+    {
+        $body = $response->body();
+        $errors = Arr::consolidate($body['error-codes'] ?? $body['errors'] ?? $body['error'] ?? []);
+        return [
+            'action' => $body['action'] ?? '',
             'errors' => $this->errors($errors),
-            'score' => Arr::get($body, 'score', 0),
-            'success' => wp_validate_boolean(Arr::get($body, 'success')),
+            'score' => $body['score'] ?? 0,
+            'success' => wp_validate_boolean($body['success'] ?? false),
         ];
     }
 
@@ -116,14 +114,9 @@ abstract class CaptchaValidatorAbstract extends ValidatorAbstract
         return '';
     }
 
-    protected function siteVerifyUrl(): string
-    {
-        return '';
-    }
-
     protected function token(): string
     {
-        return '';
+        return $this->request['_captcha'] ?? '';
     }
 
     protected function verifyStatus(): int
@@ -139,20 +132,21 @@ abstract class CaptchaValidatorAbstract extends ValidatorAbstract
         if (empty($this->token())) {
             return static::CAPTCHA_EMPTY; // fail early
         }
-        $data = $this->data();
-        $response = $this->makeRequest($data);
-        if (empty($response)) {
+        $body = $this->requestBody();
+        $response = glsr(Api::class, ['url' => static::API_URL])->post('', $this->requestArgs($body));
+        if ($response->failed()) {
             return static::CAPTCHA_FAILED;
         }
-        if ($this->isTokenValid($response)) {
+        $responseBody = $this->responseBody($response);
+        if ($this->isTokenValid($responseBody)) {
             return static::CAPTCHA_VALID;
         }
-        if (!empty($response['errors'])) {
-            $data['secret'] = Str::mask($this->siteSecret(), 4, 4, 20);
-            $data['sitekey'] = Str::mask($this->siteKey(), 4, 4, 20);
-            glsr_log()->error($response)->debug($data);
+        if (!empty($responseBody['errors'])) {
+            $body['secret'] = Str::mask($this->siteSecret(), 4, 4, 20);
+            $body['sitekey'] = Str::mask($this->siteKey(), 4, 4, 20);
+            glsr_log()->error($responseBody)->debug($body);
         }
-        if (empty($data['secret']) || empty($data['sitekey'])) {
+        if (empty($this->siteSecret()) || empty($this->siteKey())) {
             return static::CAPTCHA_FAILED;
         }
         return static::CAPTCHA_INVALID;

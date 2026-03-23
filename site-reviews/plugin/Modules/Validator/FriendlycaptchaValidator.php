@@ -7,6 +7,8 @@ use GeminiLabs\SiteReviews\Modules\Captcha;
 
 class FriendlycaptchaValidator extends CaptchaValidatorAbstract
 {
+    public const API_URL = 'https://api.friendlycaptcha.com/api/v1/siteverify';
+
     /**
      * @see https://docs.friendlycaptcha.com/
      */
@@ -17,6 +19,7 @@ class FriendlycaptchaValidator extends CaptchaValidatorAbstract
             'language' => $this->getLocale(),
             'sitekey' => $this->siteKey(),
             'theme' => glsr_get_option('forms.captcha.theme'),
+            'token_field' => 'frc-captcha-solution',
             'type' => 'friendlycaptcha',
             'urls' => [ // order is intentional, module should always load first
                 'module' => 'https://unpkg.com/friendly-challenge@0.9.4/widget.module.min.js',
@@ -30,15 +33,9 @@ class FriendlycaptchaValidator extends CaptchaValidatorAbstract
         return glsr(Captcha::class)->isEnabled('friendlycaptcha');
     }
 
-    protected function data(): array
-    {
-        return [
-            'secret' => $this->siteSecret(),
-            'sitekey' => $this->siteKey(),
-            'solution' => $this->token(),
-        ];
-    }
-
+    /**
+     * @see https://developer.friendlycaptcha.com/docs/v1/api/
+     */
     protected function errorCodes(): array
     {
         return [
@@ -63,6 +60,18 @@ class FriendlycaptchaValidator extends CaptchaValidatorAbstract
         return parent::errors($errors);
     }
 
+    /**
+     * @see https://developer.friendlycaptcha.com/docs/v1/api/
+     */
+    protected function requestBody(): array
+    {
+        return [
+            'secret' => $this->siteSecret(),
+            'sitekey' => $this->siteKey(),
+            'solution' => $this->token(),
+        ];
+    }
+
     protected function siteKey(): string
     {
         return glsr_get_option('forms.friendlycaptcha.key');
@@ -71,15 +80,5 @@ class FriendlycaptchaValidator extends CaptchaValidatorAbstract
     protected function siteSecret(): string
     {
         return glsr_get_option('forms.friendlycaptcha.secret');
-    }
-
-    protected function siteVerifyUrl(): string
-    {
-        return 'https://api.friendlycaptcha.com/api/v1/siteverify';
-    }
-
-    protected function token(): string
-    {
-        return $this->request['_frcaptcha'] ?? '';
     }
 }

@@ -864,7 +864,8 @@ return [ // order is intentional
         'options' => [ // order is intentional
             '' => _x('Do not use', 'admin-text', 'site-reviews'),
             'turnstile' => _x('Use Cloudflare Turnstile', 'admin-text', 'site-reviews'),
-            'friendlycaptcha' => _x('Use Friendly Captcha', 'admin-text', 'site-reviews'),
+            'friendlycaptcha' => _x('Use Friendly Captcha v1', 'admin-text', 'site-reviews'),
+            'friendlycaptcha_v2' => _x('Use Friendly Captcha v2', 'admin-text', 'site-reviews'),
             'hcaptcha' => _x('Use hCaptcha', 'admin-text', 'site-reviews'),
             'procaptcha' => _x('Use Prosopo Procaptcha', 'admin-text', 'site-reviews'),
             'recaptcha_v2_invisible' => _x('Use reCAPTCHA v2 Invisible', 'admin-text', 'site-reviews'),
@@ -877,7 +878,10 @@ return [ // order is intentional
     'settings.forms.friendlycaptcha.key' => [
         'default' => '',
         'depends_on' => [
-            'settings.forms.captcha.integration' => ['friendlycaptcha'],
+            'settings.forms.captcha.integration' => [
+                'friendlycaptcha',
+                'friendlycaptcha_v2',
+            ],
         ],
         'label' => _x('Site Key', 'admin-text', 'site-reviews'),
         'sanitizer' => 'text',
@@ -887,7 +891,10 @@ return [ // order is intentional
     'settings.forms.friendlycaptcha.secret' => [
         'default' => '',
         'depends_on' => [
-            'settings.forms.captcha.integration' => ['friendlycaptcha'],
+            'settings.forms.captcha.integration' => [
+                'friendlycaptcha',
+                'friendlycaptcha_v2',
+            ],
         ],
         'label' => _x('API Key', 'admin-text', 'site-reviews'),
         'sanitizer' => 'text',
@@ -943,11 +950,11 @@ return [ // order is intentional
         'label' => _x('CAPTCHA Type', 'admin-text', 'site-reviews'),
         'options' => [
             'frictionless' => _x('Frictionless (invisible to the user)', 'admin-text', 'site-reviews'),
-            'image' => _x('Image (solve a simple image CAPTCHA)', 'admin-text', 'site-reviews'),
-            'pow' => _x('Proof of Work (solve a cryptographic puzzle)', 'admin-text', 'site-reviews'),
+            'image' => _x('Image Captcha (identify objects in images)', 'admin-text', 'site-reviews'),
+            'pow' => _x('Proof of Work (perform computational tasks)', 'admin-text', 'site-reviews'),
         ],
         'sanitizer' => 'text',
-        'tooltip' => _x('The type of CAPTCHA to render.', 'admin-text', 'site-reviews'),
+        'tooltip' => _x('This should match the CAPTCHA Type in your portal settings.', 'admin-text', 'site-reviews'),
         'type' => 'select',
     ],
     'settings.forms.recaptcha.key' => [
@@ -1047,6 +1054,7 @@ return [ // order is intentional
         'depends_on' => [
             'settings.forms.captcha.integration' => [
                 'friendlycaptcha',
+                'friendlycaptcha_v2',
                 'hcaptcha',
                 'procaptcha',
                 'turnstile',
@@ -1067,6 +1075,7 @@ return [ // order is intentional
         'depends_on' => [
             'settings.forms.captcha.integration' => [
                 'friendlycaptcha',
+                'friendlycaptcha_v2',
                 'hcaptcha',
                 'procaptcha',
                 'recaptcha_v2_invisible',
@@ -1089,6 +1098,7 @@ return [ // order is intentional
         'depends_on' => [
             'settings.forms.captcha.integration' => [
                 'friendlycaptcha',
+                'friendlycaptcha_v2',
                 'hcaptcha',
                 'procaptcha',
                 'recaptcha_v2_invisible',
