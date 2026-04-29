@@ -29,8 +29,11 @@ class MetaboxForm extends Form
     public function config(): array
     {
         $config = glsr()->config('forms/metabox-fields');
-        if (2 > count(glsr()->retrieveAs('array', 'review_types'))) {
+        if (count(glsr()->retrieveAs('array', 'review_types')) < 2) {
             unset($config['type']);
+        }
+        if (in_array($this->review->type, ['', 'local'])) {
+            unset($config['url']);
         }
         foreach ($config as $key => $values) {
             $value = $this->session->values[$key] ?? '';
