@@ -8,11 +8,23 @@ use GeminiLabs\SiteReviews\Defaults\StatDefaults;
 use GeminiLabs\SiteReviews\Geolocation;
 use GeminiLabs\SiteReviews\Helper;
 use GeminiLabs\SiteReviews\Modules\Notice;
+use GeminiLabs\SiteReviews\Modules\Queue;
 use GeminiLabs\SiteReviews\Request;
+use GeminiLabs\SiteReviews\Response;
 use GeminiLabs\SiteReviews\Review;
 
 class GeolocateReview extends AbstractCommand
 {
+    /**
+     * Maximum consecutive failed lookup attempts before giving up.
+     */
+    public const MAX_RETRIES = 3;
+
+    /**
+     * Key used for the queued action.
+     */
+    public const QUEUED_ACTION_KEY = 'queue/geolocation';
+
     public array $location;
     public Review $review;
 
@@ -32,8 +44,10 @@ class GeolocateReview extends AbstractCommand
         }
         $response = glsr(Geolocation::class)->lookup($this->review->ip_address);
         if ($response->failed()) {
+            $this->retryLookup($response);
             return;
         }
+        delete_transient($this->retryKey());
         $location = $response->body();
         if (!$this->validate($location)) {
             return;
@@ -58,6 +72,33 @@ class GeolocateReview extends AbstractCommand
             'location' => $this->location,
             'notices' => glsr(Notice::class)->get(),
         ];
+    }
+
+    protected function retryKey(): string
+    {
+        return glsr()->prefix."geolocation_retry_{$this->review->ID}";
+    }
+
+    /**
+     * Reschedule a failed lookup instead of giving up.
+     * Gives up after MAX_RETRIES consecutive failures.
+     */
+    protected function retryLookup(Response $response): void
+    {
+        $retries = (int) get_transient($this->retryKey());
+        if ($retries >= static::MAX_RETRIES) {
+            delete_transient($this->retryKey());
+            glsr_log()->error("Geolocation: Giving up on review {$this->review->ID} after {$retries} failed attempts.");
+            return;
+        }
+        set_transient($this->retryKey(), $retries + 1, \HOUR_IN_SECONDS);
+        $delay = max((int) ($response->headers['x-ttl'] ?? 0), 60);
+        // The $unique argument must be false here: when this runs inside the
+        // queued action, that action is still "in-progress" and Action Scheduler's
+        // uniqueness check (which matches pending AND running actions, including
+        // args since v4.0.0) would silently drop the retry. The retry-count
+        // transient above already prevents unbounded rescheduling.
+        glsr(Queue::class)->once(time() + $delay, static::QUEUED_ACTION_KEY, ['review_id' => $this->review->ID], false);
     }
 
     protected function validate(array $location): bool

@@ -3,11 +3,11 @@ Contributors: geminilabs, pryley
 Donate link: https://ko-fi.com/pryley
 Tags: reviews, ratings, testimonials, product reviews, business reviews
 Tested up to: 7.0
-Stable tag: 8.0.13
+Stable tag: 8.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Site Reviews is a complete review management solution that integrates with WooCommerce and SureCart and works similarly to reviews on Amazon, Tripadvisor, and Yelp.
+Site Reviews is the best free reviews plugin. It integrates with WooCommerce & SureCart and works just like reviews on Amazon, Tripadvisor, and Yelp.
 
 == Description ==
 
@@ -149,7 +149,7 @@ Site Reviews is officially compatible with the following plugins:
 
 - MySQL 5.6 or greater
 - PHP 8.1.2 or greater
-- WordPress 6.7 or greater
+- WordPress 6.8 or greater
 
 = Automatic installation =
 
@@ -210,6 +210,24 @@ You can report any security bugs found in the source code of this plugin through
 This update requires a minimum of PHP 8.1.2 and WordPress 6.7. There are a few potentially breaking changes, so please make sure to read the plugin's changelog and Upgrade Guide after updating.
 
 == Changelog ==
+
+= 8.1.0 (2026-07-11) =
+
+- Added a migration to backfill missing post_date_gmt values on existing reviews
+- Fixed admin settings page styling in WordPress 7.0
+- Fixed an unbounded reviews-per-page query parameter that could exhaust server resources
+- Fixed color sanitization to ignore empty values
+- Fixed Discord and Slack webhook URL validation to prevent a host-matching bypass
+- Fixed geolocation batch processing to reschedule failed or rate-limited requests instead of blocking the queue worker
+- Fixed geolocation retries being silently dropped by the scheduled actions queue
+- Fixed malformed markup in the reviews list-table rating column for ratings greater than 5
+- Fixed random review ordering so paginated results stay consistent within the hour
+- Improved block editor performance by prefetching component options
+- Improved encryption key derivation to use HKDF (existing encrypted data still decrypts)
+- Improved escaping of admin notices on the Scheduled Actions page
+- Improved the markup of admin error notices
+- Updated Action Scheduler to v4.0.0 (failed actions are now purged after 3 months)
+- Updated the minimum required WordPress version to 6.8
 
 = 8.0.13 (2026-07-03) =
 
