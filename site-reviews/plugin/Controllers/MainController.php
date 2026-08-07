@@ -76,9 +76,12 @@ class MainController extends AbstractController
      */
     public function onMigrationEnd(): void
     {
-        $settings = glsr(OptionManager::class)->wp(OptionManager::databaseKey(), []);
+        // This method persists what it reads. The raw migration writes can
+        // leave the options cache stale; a stale read overwrites the settings.
+        OptionManager::flushSettingsCache();
+        $settings = glsr(OptionManager::class)->reset(); // fresh composed view
         $settings = glsr(OptionManager::class)->clean($settings);
-        update_option(OptionManager::databaseKey(), $settings, true);
+        glsr(OptionManager::class)->replace($settings); // persists addon settings to their own options
     }
 
     /**

@@ -25,7 +25,12 @@ class ApproveReview extends AbstractCommand
             $this->fail();
             return;
         }
-        if (!glsr()->can('edit_post', $this->review->ID)) {
+        if (!$this->review->isValid()) {
+            glsr_log()->error('Cannot approve review: Invalid review');
+            $this->fail();
+            return;
+        }
+        if (!glsr()->can('publish_post', $this->review->ID)) {
             glsr_log()->error('Cannot approve review: Invalid permission.');
             $this->fail();
             return;
@@ -40,7 +45,8 @@ class ApproveReview extends AbstractCommand
             $this->fail();
             return;
         }
-        $message = sprintf(_x('The %sreview%s was approved successfully.', 'admin-text', 'site-reviews'),
+        /* translators: %1$s: opening link tag to edit the review, %2$s: closing link tag */
+        $message = sprintf(_x('The %1$sreview%2$s was approved successfully.', 'admin-text', 'site-reviews'),
             sprintf('<a href="%s">', $this->review->editUrl()), '</a>'
         );
         glsr(Notice::class)->addSuccess($message);

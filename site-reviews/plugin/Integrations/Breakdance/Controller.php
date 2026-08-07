@@ -88,7 +88,7 @@ class Controller extends AbstractController
             });
         }
         wp_send_json_success($data, 200);
-        exit; // @phpstan-ignore-line
+        glsr_exit(); // @phpstan-ignore-line
     }
 
     /**
@@ -143,14 +143,6 @@ class Controller extends AbstractController
             true // excludeFromElementStudio
         );
         \Breakdance\ElementStudio\registerSaveLocation(
-            "{$pluginDir}/assets/breakdance/macros",
-            'GLSR_Breakdance',
-            'macro',
-            'Site Reviews Macros',
-            true, // onlyForAdvancedUsers
-            true // excludeFromElementStudio
-        );
-        \Breakdance\ElementStudio\registerSaveLocation(
             "{$pluginDir}/assets/breakdance/presets",
             'GLSR_Breakdance',
             'preset',
@@ -187,7 +179,7 @@ class Controller extends AbstractController
     public function registerRoutes(): void
     {
         return; // We can't use this yet...
-        // $input = filter_input_array(INPUT_POST, [ // @phpstan-ignore-line
+        // $input = filter_input_array(INPUT_POST, [
         //     'requestData' => [
         //         'context' => [
         //             'filter' => fn ($value) => is_numeric($value)

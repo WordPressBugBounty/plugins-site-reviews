@@ -14,9 +14,7 @@ abstract class Block implements BlockContract
 
     public function register(): void
     {
-        $block = (new \ReflectionClass($this))->getShortName();
-        $block = str_replace('_block', '', Str::snakeCase($block));
-        register_block_type_from_metadata($this->app()->path("assets/blocks/{$block}"), [
+        register_block_type_from_metadata($this->metadataDir(), [
             'render_callback' => [$this, 'render'],
         ]);
     }
@@ -75,6 +73,13 @@ abstract class Block implements BlockContract
         return $this->shortcodeInstance()->hasVisibleFields($attributes);
     }
 
+    protected function metadataDir(): string
+    {
+        $block = (new \ReflectionClass($this))->getShortName();
+        $block = str_replace('_block', '', Str::snakeCase($block));
+        return $this->app()->path("assets/blocks/{$block}");
+    }
+
     protected function resolveAlign(array $attributes, string $presetKey): string
     {
         $alignMap = [
@@ -86,11 +91,20 @@ abstract class Block implements BlockContract
             : '';
     }
 
-    protected function resolveColor(array $attributes, string $presetKey, string $customKey): string
+    /**
+     * A theme preset variable is undefined once the theme that provided it is no longer
+     * active. Without a fallback the declaration is invalid at computed-value time and
+     * the element it colours becomes transparent. The colour the preset was picked as is
+     * stored alongside the slug, so it is preferred; $fallback covers markup that carries
+     * a slug and nothing else.
+     */
+    protected function resolveColor(array $attributes, string $presetKey, string $customKey, string $fallback = 'currentColor'): string
     {
-        return !empty($attributes[$presetKey])
-            ? "var(--wp--preset--color--{$attributes[$presetKey]})"
-            : ($attributes[$customKey] ?? '');
+        $custom = $attributes[$customKey] ?? '';
+        if (empty($attributes[$presetKey])) {
+            return $custom;
+        }
+        return "var(--wp--preset--color--{$attributes[$presetKey]}, ".($custom ?: $fallback).')';
     }
 
     protected function wrapperAttributes(array $args): array

@@ -14,6 +14,17 @@ class Gatekeeper
     public const ERROR_NOT_SUPPORTED = 'not_supported';
     public const ERROR_NOT_TESTED = 'not_tested';
 
+    /**
+     * The error grades that refuse a request to enable an integration.
+     * ERROR_NOT_TESTED is deliberately absent: an untested version is a
+     * warning, not an enforcement (see allowsEnabling).
+     */
+    public const BLOCKING_ERRORS = [
+        self::ERROR_NOT_ACTIVATED,
+        self::ERROR_NOT_INSTALLED,
+        self::ERROR_NOT_SUPPORTED,
+    ];
+
     public function __construct(array $dependencies)
     {
         $this->errors = [];
@@ -44,6 +55,19 @@ class Gatekeeper
             return false;
         }
         return true;
+    }
+
+    /**
+     * Every failed check still stores its notice, but only a blocking-grade
+     * error refuses enabling — an untested version warns without refusing.
+     */
+    public function allowsEnabling(): bool
+    {
+        if ($this->allows()) {
+            return true;
+        }
+        $errors = wp_list_pluck($this->errors, 'error');
+        return empty(array_intersect($errors, static::BLOCKING_ERRORS));
     }
 
     public function hasErrors(): bool

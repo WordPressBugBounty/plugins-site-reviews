@@ -58,7 +58,7 @@ abstract class Controller extends AbstractController
      */
     public function filterCapabilities(array $capabilities): array
     {
-        if (!$this->app()->post_type) { // @phpstan-ignore-line
+        if (!$this->app()->hasPostType()) {
             return $capabilities;
         }
         $defaults = [
@@ -193,7 +193,7 @@ abstract class Controller extends AbstractController
     }
 
     /**
-     * @filter {$this->app()->id}/render/view
+     * @filter {$this->app()->hookPrefix()}/render/view
      */
     public function filterRenderView(string $view): string
     {
@@ -210,7 +210,7 @@ abstract class Controller extends AbstractController
      */
     public function filterRoles(array $roles): array
     {
-        if (!$this->app()->post_type) { // @phpstan-ignore-line
+        if (!$this->app()->hasPostType()) {
             return $roles;
         }
         $defaults = [
@@ -287,11 +287,36 @@ abstract class Controller extends AbstractController
     }
 
     /**
+     * Merges the addon's settings config into the shared settings form,
+     * remounting keys at the addon's composed-view path. A depends_on key
+     * names a setting and is mounted the same way, so a config can be written
+     * entirely in short keys and stay correct in both shapes.
+     *
      * @filter site-reviews/settings
      */
     public function filterSettings(array $settings): array
     {
-        return array_merge($this->app()->config('settings'), $settings);
+        $config = [];
+        $standalone = "settings.addons.{$this->app()->slug}.";
+        $prefix = "settings.{$this->app()->settingsPath()}.";
+        $mount = function (string $key) use ($standalone, $prefix): string {
+            if (str_starts_with($key, 'settings.addons.')) {
+                return str_starts_with($key, $standalone)
+                    ? $prefix.substr($key, strlen($standalone)) // this addon's own standalone-era spelling
+                    : $key; // another addon's, already qualified
+            }
+            return $prefix.Str::removePrefix($key, 'settings.');
+        };
+        foreach ($this->app()->config('settings') as $key => $values) {
+            if (!empty($values['depends_on']) && is_array($values['depends_on'])) {
+                $values['depends_on'] = array_combine(
+                    array_map($mount, array_keys($values['depends_on'])),
+                    $values['depends_on']
+                );
+            }
+            $config[$mount($key)] = $values;
+        }
+        return array_merge($config, $settings);
     }
 
     /**
@@ -307,8 +332,12 @@ abstract class Controller extends AbstractController
      */
     public function filterTranslationEntries(array $entries): array
     {
-        $potFile = $this->app()->path("{$this->app()->languages}/{$this->app()->id}.pot");
-        return glsr(Translation::class)->extractEntriesFromPotFile($potFile, $this->app()->id, $entries);
+        $addon = $this->app();
+        if ($addon instanceof Addon && $addon->hostedBy()) {
+            return $entries; // the host's catalog carries the hosted addon's strings
+        }
+        $potFile = $addon->path("{$addon->languages}/{$addon->id}.pot");
+        return glsr(Translation::class)->extractEntriesFromPotFile($potFile, $addon->id, $entries);
     }
 
     /**
@@ -316,14 +345,50 @@ abstract class Controller extends AbstractController
      */
     public function filterTranslatorDomains(array $domains): array
     {
-        return [...$domains, $this->app()->id];
+        $addon = $this->app();
+        if ($addon instanceof Addon && $addon->hostedBy()) {
+            return $domains; // hosted addons translate under the host's domain
+        }
+        return [...$domains, $addon->id];
     }
 
     /**
-     * @action {$this->app()->id}/activated
+     * @action {$this->app()->hookPrefix()}/activated
      */
     public function install(): void
     {
+    }
+
+    /**
+     * Migrates legacy addon settings (stored in the core plugin's option) to
+     * the addon's own option. One-shot: skipped once the addon's option exists.
+     * The legacy subtree is copied, not deleted — it is shadowed by the composed
+     * settings view and garbage-collected on the next settings save; leaving it
+     * in place protects downgrades to older addon versions.
+     *
+     * @action admin_init:5
+     * @action {$this->app()->hookPrefix()}/activated
+     */
+    public function migrateOptions(): void
+    {
+        $addon = $this->app();
+        if (!$addon instanceof Addon || 'settings' !== $addon->storagePath()) {
+            return;
+        }
+        if ($addon->isHost()) {
+            return; // a host imports its own state
+        }
+        $key = $addon->storageKey();
+        if (false !== get_option($key)) {
+            return;
+        }
+        $legacy = Arr::consolidate(glsr(OptionManager::class)->wp(OptionManager::databaseKey(), []));
+        $legacy = Arr::getAs('array', $legacy, "settings.addons.{$addon->slug}");
+        add_option($key, [
+            'settings' => $legacy,
+            'version' => $addon->version,
+        ], '', true);
+        glsr()->discard('settings'); // recompose the settings view
     }
 
     /**

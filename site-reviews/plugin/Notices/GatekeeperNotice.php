@@ -27,22 +27,22 @@ class GatekeeperNotice extends AbstractNotice
         }
         $this->errors = $errors;
         delete_transient($transient);
+        if (empty($this->errors(Gatekeeper::BLOCKING_ERRORS))) {
+            $this->type = 'notice-warning'; // untested versions only: a warning, not a failure
+        }
         return true;
     }
 
     protected function data(): array
     {
-        $externalErrors = $this->errors([
-            Gatekeeper::ERROR_NOT_ACTIVATED,
-            Gatekeeper::ERROR_NOT_INSTALLED,
-            Gatekeeper::ERROR_NOT_SUPPORTED,
-        ]);
+        $externalErrors = $this->errors(Gatekeeper::BLOCKING_ERRORS);
         $internalErrors = $this->errors([Gatekeeper::ERROR_NOT_TESTED]);
         $name = sprintf('<strong>%s</strong>', glsr()->name);
         if (!empty($externalErrors)) {
+            /* translators: %1$s: this plugin's name, %2$s: link(s) to the required plugin(s) */
             $message = _nx(
-                '%s requires the latest version of %s to enable the integration.',
-                '%s requires the latest version of the following plugins to enable integration: %s',
+                '%1$s requires the latest version of %2$s to enable the integration.',
+                '%1$s requires the latest version of the following plugins to enable integration: %2$s',
                 count($externalErrors),
                 'admin-text',
                 'site-reviews'
@@ -52,9 +52,10 @@ class GatekeeperNotice extends AbstractNotice
                 'message' => sprintf($message, $name, $this->pluginLinks($externalErrors)),
             ];
         }
+        /* translators: %1$s: this plugin's name, %2$s: link(s) to the untested plugin(s) */
         $message = _nx(
-            '%s needs an update to work with %s.',
-            '%s needs an update to work with the following plugins: %s',
+            '%1$s has not been tested with the installed version of %2$s and may need an update.',
+            '%1$s has not been tested with the installed versions of the following plugins and may need an update: %2$s',
             count($internalErrors),
             'admin-text',
             'site-reviews'
@@ -67,8 +68,12 @@ class GatekeeperNotice extends AbstractNotice
 
     protected function errors(array $errorKeys): array
     {
-        return array_filter($this->errors,
-            fn ($data) => in_array(Arr::get($data, 'error'), $errorKeys)
+        $errors = array_map(
+            fn ($data) => glsr(GatekeeperNoticeDefaults::class)->restrict(Arr::consolidate($data)),
+            $this->errors
+        );
+        return array_filter($errors,
+            fn ($data) => in_array($data['error'], $errorKeys)
         );
     }
 
@@ -105,6 +110,7 @@ class GatekeeperNotice extends AbstractNotice
             'name' => $data['name'],
             'nonce_prefix' => 'activate-plugin_',
             'plugin' => $data['plugin'],
+            /* translators: %s: the plugin name */
             'text' => _x('Activate %s', 'admin-text', 'site-reviews'),
         ]);
     }
@@ -120,6 +126,7 @@ class GatekeeperNotice extends AbstractNotice
             'name' => $data['name'],
             'nonce_prefix' => 'install-plugin_',
             'plugin' => $data['textdomain'],
+            /* translators: %s: the plugin name */
             'text' => _x('Install %s', 'admin-text', 'site-reviews'),
         ]);
     }
@@ -135,6 +142,7 @@ class GatekeeperNotice extends AbstractNotice
             'name' => $data['name'],
             'nonce_prefix' => 'upgrade-plugin_',
             'plugin' => $data['plugin'],
+            /* translators: %s: the plugin name */
             'text' => _x('Update %s', 'admin-text', 'site-reviews'),
         ]);
     }
@@ -162,10 +170,6 @@ class GatekeeperNotice extends AbstractNotice
     {
         $actions = [];
         foreach ($errors as $plugin => $data) {
-            $data = glsr(GatekeeperNoticeDefaults::class)->restrict($data);
-            if (empty($data['error'])) {
-                continue;
-            }
             $method = Helper::buildMethodName('pluginAction', $data['error']);
             if (method_exists($this, $method)) {
                 $data['plugin'] = $plugin;
@@ -179,7 +183,6 @@ class GatekeeperNotice extends AbstractNotice
     {
         $links = [];
         foreach ($errors as $plugin => $data) {
-            $data = glsr(GatekeeperNoticeDefaults::class)->restrict($data);
             $links[] = sprintf('<span class="plugin-%s"><a href="%s">%s</a></span>',
                 $data['textdomain'],
                 $data['plugin_uri'],

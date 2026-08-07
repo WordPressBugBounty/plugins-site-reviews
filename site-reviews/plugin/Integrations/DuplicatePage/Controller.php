@@ -4,6 +4,7 @@ namespace GeminiLabs\SiteReviews\Integrations\DuplicatePage;
 
 use GeminiLabs\SiteReviews\Controllers\AbstractController;
 use GeminiLabs\SiteReviews\Database\ReviewManager;
+use GeminiLabs\SiteReviews\Helper;
 use GeminiLabs\SiteReviews\Helpers\Str;
 use GeminiLabs\SiteReviews\Review;
 
@@ -14,8 +15,8 @@ class Controller extends AbstractController
      */
     public function duplicateReview(): void
     {
-        $nonce = filter_input(INPUT_GET, 'nonce') ?: filter_input(INPUT_POST, 'nonce');
-        $postId = filter_input(INPUT_GET, 'post') ?: filter_input(INPUT_POST, 'post');
+        $nonce = Helper::input(\INPUT_GET, 'nonce') ?: Helper::input(\INPUT_POST, 'nonce');
+        $postId = Helper::input(\INPUT_GET, 'post') ?: Helper::input(\INPUT_POST, 'post');
         if (!Review::isReview($postId)) {
             return; // not a review so don't override
         }
@@ -36,7 +37,7 @@ class Controller extends AbstractController
             ]);
         }
         wp_redirect($this->redirectUrl($review->ID));
-        exit;
+        glsr_exit();
     }
 
     protected function redirectUrl(int $postId): string
@@ -44,9 +45,9 @@ class Controller extends AbstractController
         $options = get_option('duplicate_page_options');
         $redirect = $options['duplicate_post_redirect'] ?? 'to_list';
         if ('to_page' === $redirect) {
-            $url = admin_url('edit.php?post_type='.glsr()->post_type);
-        } else {
             $url = admin_url('post.php?action=edit&post='.$postId);
+        } else {
+            $url = admin_url('edit.php?post_type='.glsr()->post_type);
         }
         return sanitize_url($url);
     }

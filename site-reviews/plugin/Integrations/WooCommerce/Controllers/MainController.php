@@ -203,7 +203,7 @@ class MainController extends AbstractController
             && 'product' === filter_input(INPUT_GET, 'post_type')
             && 'product-reviews' === filter_input(INPUT_GET, 'page')) {
             wp_redirect(add_query_arg('notice', 'product-reviews', glsr_admin_url()), 301);
-            exit;
+            glsr_exit();
         }
     }
 
@@ -261,6 +261,6 @@ class MainController extends AbstractController
      */
     public function verifyProductOwner(Review $review): void
     {
-        $review->hasVerifiedOwner();
+        $review->hasVerifiedOwner(); // @phpstan-ignore-line
     }
 }

@@ -93,10 +93,12 @@ class ProcessCsvFile extends AbstractCommand
     protected function formatRecord(array $record): array
     {
         if (!empty($record['date'])) {
-            $date = \DateTime::createFromFormat($this->dateFormat, $record['date']);
+            // The "!" resets every field the format does not mention. Without it,
+            // DateTime::createFromFormat() fills them from the CURRENT time.
+            $date = \DateTime::createFromFormat('!'.$this->dateFormat, $record['date']);
             $record['date'] = $date->format('Y-m-d H:i:s'); // format the provided date
         }
-        if (1 === preg_match('#/'.glsr()->ID.'/avatars/[A-Z]+\.svg$#', ($record['avatar'] ?? ''))) {
+        if (1 === preg_match('#/'.glsr()->ID.'/avatars/[A-Z]+\.svg$#', $record['avatar'] ?? '')) {
             $record['avatar'] = ''; // discard locally generated avatar SVG URLs
         }
         return $record;
@@ -104,9 +106,7 @@ class ProcessCsvFile extends AbstractCommand
 
     protected function process(UploadedFile $file): bool
     {
-        if (!defined('WP_IMPORTING')) {
-            define('WP_IMPORTING', true);
-        }
+        glsr(ImportManager::class)->markImporting();
         glsr(ImportManager::class)->flush(); // flush the temporary table in the database
         glsr(ImportManager::class)->unlinkTempFile(); // delete the temporary import file if it exists
         try {
@@ -117,19 +117,19 @@ class ProcessCsvFile extends AbstractCommand
                 throw new Exception(_x('The CSV file could not be imported. Please verify the following details and try again:', 'admin-text', 'site-reviews'));
             }
             $filePath = glsr(ImportManager::class)->tempFilePath();
-            $writer = Writer::createFromPath($filePath, 'w+');
-            $writer->addFormatter(new EscapeFormula());
+            $writer = $this->writer($filePath);
             $writer->insertOne($header);
             $writer->addFormatter(fn (array $record) => $this->formatRecord($record));
-            $chunks = $reader->chunkBy(1000);
-            foreach ($chunks as $chunk) {
-                $records = Statement::create()
-                    ->where(fn (array $record) => !empty(array_filter($record, 'trim'))) // @phpstan-ignore-line remove empty rows
-                    ->where(fn (array $record) => $this->validateRecord($record))
-                    ->process($reader, $header);
-                $writer->insertAll($records);
-                $this->total += count($records);
-            }
+            $records = Statement::create()
+                ->where(fn (array $record) => !empty(array_filter($record, 'trim'))) // @phpstan-ignore-line remove empty rows
+                ->where(fn (array $record) => $this->validateRecord($record))
+                ->process($reader, $header);
+            $writer->insertAll((function () use ($records) {
+                foreach ($records as $record) {
+                    ++$this->total; // count them on the way past: they are only read once
+                    yield $record;
+                }
+            })());
             glsr(ImportManager::class)->prepare(); // create a temporary table for importing
             return true;
         } catch (CannotInsertRecord $e) {
@@ -188,6 +188,7 @@ class ProcessCsvFile extends AbstractCommand
         }
         if (!$file->hasMimeType('text/csv')) {
             glsr(Notice::class)->addError(sprintf(
+                /* translators: %s: detected mime type */
                 _x('The import file does not look like a valid CSV file (detected: %s). If this is incorrect, make sure that your server is configured to detect mime types.', 'admin-text', 'site-reviews'),
                 $file->getMimeType()
             ));
@@ -214,5 +215,12 @@ class ProcessCsvFile extends AbstractCommand
         $this->errors = array_merge($this->errors, $errors);
         ++$this->skipped;
         return false;
+    }
+
+    protected function writer(string $filePath): Writer
+    {
+        $writer = Writer::createFromPath($filePath, 'w+');
+        $writer->addFormatter(new EscapeFormula());
+        return $writer;
     }
 }

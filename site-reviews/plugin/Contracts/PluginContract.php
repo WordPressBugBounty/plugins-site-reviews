@@ -49,6 +49,10 @@ interface PluginContract
     /** @param mixed ...$args */
     public function filterArrayUnique(string $hook, ...$args): array;
 
+    public function hasPostType(): bool;
+
+    public function hookPrefix(): string;
+
     /**
      * @param mixed $fallback
      *
@@ -57,6 +61,10 @@ interface PluginContract
     public function option(string $path = '', $fallback = '', string $cast = '');
 
     public function path(string $file = '', bool $realpath = true): string;
+
+    public function settingPath(string $path = ''): string;
+
+    public function settingsPath(): string;
 
     public function render(string $view, array $data = []): void;
 

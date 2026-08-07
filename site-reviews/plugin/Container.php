@@ -45,7 +45,9 @@ abstract class Container
     public function bind(string $abstract, $concrete = null, bool $shared = false): void
     {
         $this->dropStaleInstances($abstract);
-        $concrete = Helper::ifTrue(is_null($concrete), $abstract, $concrete);
+        if (is_null($concrete)) {
+            $concrete = $abstract;
+        }
         if (!$concrete instanceof \Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }
@@ -61,7 +63,9 @@ abstract class Container
     {
         if (is_string($abstract) && !class_exists($abstract)) {
             $alias = __NAMESPACE__.'\\'.Str::removePrefix($abstract, __NAMESPACE__);
-            $abstract = Helper::ifTrue(class_exists($alias), $alias, $abstract);
+            if (class_exists($alias)) {
+                $abstract = $alias;
+            }
         }
         return $this->resolve($abstract, $parameters);
     }
@@ -118,14 +122,14 @@ abstract class Container
     }
 
     /**
-     * @return \ReflectionClass|\ReflectionNamedType|\ReflectionType|null
+     * The plugin's constructor dependencies are always single named classes,
+     * never union or intersection types.
+     *
+     * @return \ReflectionNamedType|null
      */
     protected function getClass(\ReflectionParameter $parameter)
     {
-        if (version_compare(phpversion(), '8', '<')) {
-            return $parameter->getClass(); // @compat PHP < 8
-        }
-        return $parameter->getType();
+        return $parameter->getType(); // @phpstan-ignore return.type
     }
 
     protected function getClosure($abstract, $concrete): \Closure
@@ -166,14 +170,6 @@ abstract class Container
         return array_key_exists($dependency->name, $this->getLastParameterOverride());
     }
 
-    /**
-     * @param mixed $concrete
-     */
-    protected function isBuildable($concrete, string $abstract): bool
-    {
-        return $concrete === $abstract || $concrete instanceof \Closure;
-    }
-
     protected function isShared(string $abstract): bool
     {
         return isset($this->instances[$abstract]) || !empty($this->bindings[$abstract]['shared']);
@@ -192,11 +188,9 @@ abstract class Container
             return $this->instances[$abstract]; // return an existing singleton
         }
         $this->with[] = $parameters;
-        $concrete = $this->getConcrete($abstract);
-        $object = Helper::ifTrue($this->isBuildable($concrete, $abstract),
-            fn () => $this->construct($concrete),
-            fn () => $this->make($concrete),
-        );
+        // getConcrete() answers a Closure (bind() wraps every concrete in one)
+        // or the abstract itself; construct() builds either
+        $object = $this->construct($this->getConcrete($abstract));
         if ($this->isShared($abstract) && empty($parameters)) {
             $this->instances[$abstract] = $object; // store as a singleton
         }
@@ -231,10 +225,9 @@ abstract class Container
                 $results[] = $this->getParameterOverride($dependency);
                 continue;
             }
-            $results[] = Helper::ifTrue(is_null($this->getClass($dependency)),
-                fn () => $this->resolvePrimitive($dependency),
-                fn () => $this->resolveClass($dependency),
-            );
+            $results[] = is_null($this->getClass($dependency))
+                ? $this->resolvePrimitive($dependency)
+                : $this->resolveClass($dependency);
         }
         return $results;
     }

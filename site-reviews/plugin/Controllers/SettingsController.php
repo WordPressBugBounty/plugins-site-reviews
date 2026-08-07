@@ -36,6 +36,10 @@ class SettingsController extends AbstractController
         if (!array_key_exists('settings', $input)) {
             return $input;
         }
+        if (OptionManager::isPersisting()) {
+            // OptionManager::persist() is writing settings it already sanitized and split
+            return $input;
+        }
         $options = array_replace_recursive(glsr(OptionManager::class)->all(), [
             'settings' => $input['settings'],
         ]);
@@ -49,7 +53,7 @@ class SettingsController extends AbstractController
         }
         glsr(Notice::class)->store(); // store the notices before the page reloads
         glsr()->action('settings/updated', $options, $input);
-        return $options;
+        return glsr(OptionManager::class)->split($options); // Split addon settings out to their own options
     }
 
     protected function sanitizeAll(array $options): array
@@ -128,6 +132,7 @@ class SettingsController extends AbstractController
         foreach ($errors as $needle => $values) {
             if (!empty($values)) {
                 glsr(Notice::class)->addError(
+                    /* translators: %s: the missing placeholder tag */
                     sprintf(_x('You forgot to include the %s placeholder tags in your Custom Text.', 'admin-text', 'site-reviews'), "<code>$needle</code>"),
                     $values
                 );
@@ -145,13 +150,15 @@ class SettingsController extends AbstractController
         }
         if (!$integration->isActive()) {
             glsr(Notice::class)->addError(sprintf(
+                /* translators: %s: plugin name */
                 _x('Please install/activate the %s plugin to enable the integration.', 'admin-text', 'site-reviews'),
                 $integration->pluginName
             ));
             return false;
         } elseif (!$integration->isSupported()) {
             glsr(Notice::class)->addError(sprintf(
-                _x('Please update the %s plugin to v%s or greater to enable the integration.', 'admin-text', 'site-reviews'),
+                /* translators: %1$s: plugin name, %2$s: version number */
+                _x('Please update the %1$s plugin to v%2$s or greater to enable the integration.', 'admin-text', 'site-reviews'),
                 $integration->pluginName,
                 $integration->supportedVersion
             ));

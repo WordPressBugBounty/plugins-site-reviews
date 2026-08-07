@@ -27,11 +27,23 @@ abstract class IntegrationHooks extends AbstractHooks
         return version_compare($version, $supportedVersion, '>=');
     }
 
+    /**
+     * Integrations are hooked on "plugins_loaded" (before "init") so the notice
+     * cannot be translated here.
+     */
     protected function notify(string $name): void
     {
-        $notice = _x('Update %s to version %s or higher to enable the integration with Site Reviews.', 'admin-text', 'site-reviews');
         $supportedVersion = sanitize_text_field($this->supportedVersion());
-        glsr(Notice::class)->addWarning(sprintf($notice, $name, $supportedVersion));
+        $addWarning = function () use ($name, $supportedVersion) {
+            /* translators: %1$s: plugin name, %2$s: plugin version */
+            $notice = _x('Update %1$s to version %2$s or higher to enable the integration with Site Reviews.', 'admin-text', 'site-reviews');
+            glsr(Notice::class)->addWarning(sprintf($notice, $name, $supportedVersion));
+        };
+        if (did_action('init')) {
+            $addWarning();
+            return;
+        }
+        add_action('init', $addWarning);
     }
 
     protected function supportedVersion(): string

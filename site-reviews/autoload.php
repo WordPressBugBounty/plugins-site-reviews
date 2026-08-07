@@ -44,7 +44,6 @@ spl_autoload_register(function ($className) {
     }
     $namespaces = [
         'GeminiLabs\SiteReviews\\' => __DIR__.'/plugin/',
-        'GeminiLabs\SiteReviews\Tests\\' => __DIR__.'/tests/phpunit/tests/',
         'GeminiLabs\Laravel\SerializableClosure\\' => __DIR__.'/vendors/laravel/serializable-closure/',
         'GeminiLabs\League\Csv\\' => __DIR__.'/vendors/thephpleague/csv/',
         'GeminiLabs\Sepia\PoParser\\' => __DIR__.'/vendors/sepia/po-parser/',
@@ -65,7 +64,7 @@ spl_autoload_register(function ($className) {
         if (!file_exists($file)) {
             continue;
         }
-        require $file;
+        require_once $file;
         break;
     }
 });

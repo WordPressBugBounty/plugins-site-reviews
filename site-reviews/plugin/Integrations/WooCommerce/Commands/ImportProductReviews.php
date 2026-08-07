@@ -22,7 +22,10 @@ class ImportProductReviews extends AbstractCommand
     {
         $this->limit = max(1, $request->cast('per_page', 'int'));
         $this->offset = $this->limit * (max(1, $request->cast('page', 'int')) - 1);
-        $this->response = [];
+        $this->response = [
+            'imported' => 0,
+            'skipped' => 0,
+        ];
     }
 
     public function handle(): void
@@ -37,6 +40,7 @@ class ImportProductReviews extends AbstractCommand
         foreach ($reviews as $commentId => $values) {
             $values = Arr::consolidate($values);
             $values = array_map('trim', $values);
+            unset($values['comment_ID']); // only selected to key the results
             $request = new Request($values);
             $command = new CreateReview($request);
             if (glsr(ReviewManager::class)->create($command)) {
@@ -55,7 +59,7 @@ class ImportProductReviews extends AbstractCommand
     {
         return glsr(ImportResultDefaults::class)->restrict(
             wp_parse_args([
-                'message' => _x('Imported %d of %d reviews', 'admin-text', 'site-reviews'),
+                'message' => _x('Imported %1$d of %2$d reviews', 'admin-text', 'site-reviews'),
             ], $this->response)
         );
     }
@@ -109,7 +113,7 @@ class ImportProductReviews extends AbstractCommand
                 c.comment_author_IP AS ip_address,
                 c.comment_approved AS is_approved,
                 c.comment_post_ID AS assigned_posts,
-                c.user_id AS user_id
+                c.user_id AS author_id
             FROM table|comments AS c
             INNER JOIN table|commentmeta AS cm ON (cm.comment_id = c.comment_ID)
             WHERE 1=1

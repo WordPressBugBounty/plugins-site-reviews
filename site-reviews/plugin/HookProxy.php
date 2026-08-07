@@ -7,14 +7,16 @@ trait HookProxy
     /**
      * Proxy for WordPress defined filter/action callbacks.
      *
-     * Since we cannot ensure third-party code will pass the correct data declared
-     * by WordPress, this function allows us to maintain parameter type hints and
-     * prevents fatal errors without introducing complexity. If something goes wrong,
-     * the error is logged to the Site Reviews console.
+     * As we cannot ensure third-party code will pass correct data types declared
+     * by WordPress, this function allows us to maintain parameter types while
+     * preventing fatal errors without introducing complexity. If something goes
+     * wrong, the error is logged to the Site Reviews console and the unfiltered
+     * first argument is returned.
+     * 
+     * The "site-reviews/hook/rethrow" hook is used by the test suite to catch
+     * throwable errors.
      *
-     * Catching Throwable causes some PHPUnit tests to get flagged as risky with,
-     * "Test code or tested code did not (only) close its own output buffers".
-     * So if PHPUNIT_TESTING is defined then just skip the catch.
+     * @see HOOKS.md — site-reviews/hook/rethrow
      */
     public function proxy(string $method): callable
     {
@@ -24,12 +26,12 @@ trait HookProxy
         }
         $callback = [$this, $method];
         return static function (...$args) use ($callback, $method) {
-            if (defined('PHPUNIT_TESTING')) {
-                return call_user_func_array($callback, $args);
-            }
             try {
                 return call_user_func_array($callback, $args);
             } catch (\Throwable $error) {
+                if (glsr()->filterBool('hook/rethrow', false, $error, $method)) {
+                    throw $error; // and do not log it: it is about to surface on its own
+                }
                 glsr_log()->error($error->getMessage())->debug($error);
             }
             if (str_starts_with($method, 'filter')) {

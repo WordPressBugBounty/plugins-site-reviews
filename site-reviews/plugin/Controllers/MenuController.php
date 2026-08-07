@@ -5,12 +5,10 @@ namespace GeminiLabs\SiteReviews\Controllers;
 use GeminiLabs\SiteReviews\Api;
 use GeminiLabs\SiteReviews\Database\Cache;
 use GeminiLabs\SiteReviews\Database\Tables;
-use GeminiLabs\SiteReviews\Defaults\AddonDefaults;
 use GeminiLabs\SiteReviews\Defaults\FeatureDefaults;
 use GeminiLabs\SiteReviews\Helper;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Str;
-use GeminiLabs\SiteReviews\License;
 use GeminiLabs\SiteReviews\Modules\Console;
 use GeminiLabs\SiteReviews\Modules\Html\Builder;
 use GeminiLabs\SiteReviews\Modules\Html\SettingForm;
@@ -137,32 +135,20 @@ class MenuController extends AbstractController
      */
     public function renderPremiumMenuCallback(): void
     {
-        $addons = [];
         $features = [];
-        $isPremium = glsr(License::class)->isPremium();
-        if ($isPremium) {
-            $data = glsr(Api::class)->get('addons')->data();
-            foreach ($data as $values) {
-                $context = glsr(AddonDefaults::class)->restrict($values);
-                $addons[] = array_merge($context, compact('context'));
-            }
-        } else {
-            $data = glsr(Api::class)->get('features')->data();
-            foreach ($data as $values) {
-                $features[] = glsr(FeatureDefaults::class)->restrict($values);
-            }
-            $feature = array_column($features, 'feature');
-            $premium = array_column($features, 'premium');
-            array_multisort(
-                $premium, \SORT_DESC,
-                $feature, \SORT_ASC | \SORT_NATURAL,
-                $features
-            );
+        $data = glsr(Api::class)->get('features')->data();
+        foreach ($data as $values) {
+            $features[] = glsr(FeatureDefaults::class)->restrict($values);
         }
+        $feature = array_column($features, 'feature');
+        $premium = array_column($features, 'premium');
+        array_multisort(
+            $premium, \SORT_DESC,
+            $feature, \SORT_ASC | \SORT_NATURAL,
+            $features
+        );
         $this->renderPage('premium', [
-            'addons' => $addons,
             'features' => $features,
-            'is_premium' => $isPremium,
         ]);
     }
 
@@ -181,7 +167,12 @@ class MenuController extends AbstractController
             'addons' => _x('Addons', 'admin-text', 'site-reviews'),
             'licenses' => _x('Licenses', 'admin-text', 'site-reviews'),
         ]);
-        if (empty(Arr::get(glsr()->defaults(), 'settings.addons'))) {
+        // The installed premium plugin keeps the tab (renamed "Premium"
+        // through the addon/settings/tabs filter) even when every feature is
+        // toggled off; otherwise the tab exists only if an addon registered
+        // settings under it.
+        if (is_null(glsr()->addon('site-reviews-premium'))
+            && empty(Arr::get(glsr()->defaults(), 'settings.addons'))) {
             unset($tabs['addons']);
         }
         $this->renderPage('settings', [
@@ -279,9 +270,10 @@ class MenuController extends AbstractController
                     unset($args[$tab]);
                 }
             }
-        } elseif (array_key_exists('premium', $args) && glsr(License::class)->isPremium()) {
-            $args['premium'] = _x('Addons', 'admin-text', 'site-reviews');
         }
+        // The "premium" submenu title is an upsell ("Upgrade to Premium")
+        // unless the premium plugin is installed — it renames the page via
+        // the filter below and renders its own feature control panel.
         return glsr()->filterArray("addon/{$hookSuffix}", $args);
     }
 

@@ -125,9 +125,12 @@ class SiteReviewsSummaryShortcode extends Shortcode
                 'type' => 'number',
             ],
             'rating_field' => [
-                'description' => sprintf(_x('Use the %s addon to add custom rating fields.', 'admin-text', 'site-reviews'),
-                    glsr_premium_link('site-reviews-forms')
-                ),
+                'description' => glsr_addon_required('site-reviews-forms')
+                    /* translators: %s: link to the Review Forms addon */
+                    ? sprintf(_x('Use the %s addon to add custom rating fields.', 'admin-text', 'site-reviews'),
+                        glsr_premium_link('site-reviews-forms')
+                    )
+                    : '',
                 'group' => 'display',
                 'label' => esc_html_x('Custom Rating Field Name', 'admin-text', 'site-reviews'),
                 'type' => 'text',

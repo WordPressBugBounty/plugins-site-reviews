@@ -67,7 +67,17 @@ return [ // order is intentional
         'rows' => 3,
         'sanitizer' => 'text-html',
         'tags' => glsr('Modules\Html\TemplateTags')->filteredTags([
-            'exclude' => ['admin_email', 'approve_url', 'edit_url', 'review_link', 'review_type', 'verified_date'],
+            'exclude' => [
+                'admin_email',
+                'approve_url',
+                'edit_url',
+                'review_id',
+                'review_ip',
+                'review_link',
+                'review_response',
+                'review_type',
+                'verified_date',
+            ],
         ]),
         'tooltip' => _x('The verification email sent to the reviewer when a review is submitted.', 'admin-text', 'site-reviews'),
         'type' => 'code',
@@ -232,7 +242,14 @@ return [ // order is intentional
         'rows' => 3,
         'sanitizer' => 'text-html',
         'tags' => glsr('Modules\Html\TemplateTags')->filteredTags([
-            'exclude' => ['admin_email', 'review_link', 'review_type', 'verified_date', 'verify_url'],
+            'exclude' => [
+                'admin_email',
+                'review_link',
+                'review_response',
+                'review_type',
+                'verified_date',
+                'verify_url',
+            ],
         ]),
         'tooltip' => _x('If you are sending notifications to Slack then this template will only be used as a fallback in the event that <a href="https://api.slack.com/docs/attachments" target="_blank">Message Attachments</a> have been disabled.', 'admin-text', 'site-reviews'),
         'type' => 'code',
@@ -416,11 +433,13 @@ return [ // order is intentional
     ],
     'settings.reviews.fallback' => [
         'default' => 'yes',
+        /* translators: %s: the default fallback text */
         'description' => sprintf(_x('The default text is: %s', 'admin-text', 'site-reviews'),
             '<code>'.__('There are no reviews yet. Be the first one to write one.', 'site-reviews').'</code>'
         ),
         'label' => _x('Enable Fallback Text', 'admin-text', 'site-reviews'),
         'sanitizer' => 'text',
+        /* translators: %s: link to the Strings settings page */
         'tooltip' => sprintf(_x('Display the fallback text when there are no reviews to display. This can be changed on the %s page. You may also override this by using the "fallback" option on the shortcode.', 'admin-text', 'site-reviews'),
             glsr_admin_link('settings.strings', _x('Strings', 'admin-text', 'site-reviews'))
         ),
@@ -439,6 +458,7 @@ return [ // order is intentional
         'depends_on' => [
             'settings.reviews.geolocation' => 'yes',
         ],
+        /* translators: %s: link to the Geolocate Reviews tool */
         'description' => sprintf(_x('Use the %s tool to extract geolocation from existing reviews.', 'admin-text', 'site-reviews'),
             glsr_admin_link('tools.general', _x('Geolocate Reviews', 'admin-text', 'site-reviews'), '#tools-geolocate-reviews')
         ),
@@ -457,7 +477,8 @@ return [ // order is intentional
     'settings.reviews.pagination.url_parameter' => [
         'default' => 'yes',
         'description' => sprintf(
-            _x('If you would like to keep the pagination links but prevent search engines from indexing them, add the following lines to your %s file: %s', 'admin-text', 'site-reviews'),
+            /* translators: %1$s: link to the robots.txt website, %2$s: the robots.txt rules to add */
+            _x('If you would like to keep the pagination links but prevent search engines from indexing them, add the following lines to your %1$s file: %2$s', 'admin-text', 'site-reviews'),
             '<a href="https://www.robotstxt.org/" target="_blank">robots.txt</a>',
             '<br><code>user-agent: *</code>'.
             '<br><code>Disallow: /*?'.glsr()->constant('PAGED_QUERY_VAR').'=*</code>'.
@@ -465,6 +486,7 @@ return [ // order is intentional
         ),
         'label' => esc_html_x('Enable Paginated URLs', 'admin-text', 'site-reviews'),
         'sanitizer' => 'text',
+        /* translators: %s: the pagination URL parameter */
         'tooltip' => sprintf(_x('Paginated URLs include the %s URL parameter.', 'admin-text', 'site-reviews'),
             '<code>?'.glsr()->constant('PAGED_QUERY_VAR').'={page_number}</code>'
         ),
@@ -499,6 +521,7 @@ return [ // order is intentional
             'custom' => _x('Custom', 'admin-text', 'site-reviews'),
         ],
         'sanitizer' => 'text',
+        /* translators: %s: link to the Custom Fields metabox documentation */
         'tooltip' => sprintf(_x('You can use the %s to override this value on your page. The Custom Field name to use is:', 'admin-text', 'site-reviews').' <code>schema_type</code>',
             sprintf('<a href="https://wordpress.org/support/article/custom-fields/" target="_blank">%s</a>', _x('Custom Fields metabox', 'admin-text', 'site-reviews'))
         ),
@@ -512,7 +535,8 @@ return [ // order is intentional
         ],
         'label' => _x('Custom Schema Type', 'admin-text', 'site-reviews'),
         'sanitizer' => 'text',
-        'tooltip' => sprintf(_x('Google limits the schema types that can trigger review rich results in search. To learn more, please %sread this%s.', 'admin-text', 'site-reviews'),
+        /* translators: %1$s: opening tag of a link to the Google documentation, %2$s: closing tag */
+        'tooltip' => sprintf(_x('Google limits the schema types that can trigger review rich results in search. To learn more, please %1$sread this%2$s.', 'admin-text', 'site-reviews'),
             '<a href="https://developers.google.com/search/blog/2019/09/making-review-rich-results-more-helpful" target="_blank">',
             '</a>'
         ),
@@ -1139,6 +1163,7 @@ return [ // order is intentional
             'comments' => _x('Use the WordPress Disallowed Comment Keys', 'admin-text', 'site-reviews'),
         ],
         'sanitizer' => 'text',
+        /* translators: %s: link to the Disallowed Comment Keys setting */
         'tooltip' => sprintf(_x('Choose which Blacklist you would prefer to use for reviews. The %s option can be found in the WordPress Discussion Settings page.', 'admin-text', 'site-reviews'),
             '<a href="'.admin_url('options-discussion.php').'">'._x('Disallowed Comment Keys', 'admin-text', 'site-reviews').'</a>'
         ),

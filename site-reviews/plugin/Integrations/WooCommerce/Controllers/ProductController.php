@@ -167,6 +167,28 @@ class ProductController implements ControllerContract
     }
 
     /**
+     * An empty string makes the Product Details hide-empty pass drop the
+     * native reviews item; the plugin's reviews arrive through that block's
+     * compatibility layer (see filterProductTabs). The legacy structure
+     * routes through comments_template(), which filterCommentsTemplate owns.
+     *
+     * @param string $blockContent
+     * @param array  $parsedBlock
+     *
+     * @filter render_block_woocommerce/product-reviews
+     */
+    public function filterProductReviewsBlock($blockContent, $parsedBlock): string
+    {
+        if (empty($parsedBlock['innerBlocks'])) {
+            return Cast::toString($blockContent);
+        }
+        if (apply_filters('woocommerce_disable_compatibility_layer', false)) {
+            return Cast::toString($blockContent); // without the compatibility layer, this block is the only reviews UI
+        }
+        return '';
+    }
+
+    /**
      * @param array $tabs
      *
      * @filter woocommerce_product_tabs
@@ -179,6 +201,7 @@ class ProductController implements ControllerContract
             $tabs['reviews'] = [
                 'callback' => [$this, 'renderSingleProductReviews'],
                 'priority' => 30,
+                /* translators: %d: number of reviews */
                 'title' => sprintf(__('Reviews (%d)', 'site-reviews'), $product->get_review_count()),
             ];
         }

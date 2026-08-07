@@ -2,12 +2,9 @@
 
 namespace GeminiLabs\SiteReviews\Commands;
 
-use GeminiLabs\SiteReviews\Database;
-use GeminiLabs\SiteReviews\Database\OptionManager;
 use GeminiLabs\SiteReviews\Database\PostMeta;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Modules\Email;
-use GeminiLabs\SiteReviews\Modules\Html\Template;
 use GeminiLabs\SiteReviews\Modules\Html\TemplateTags;
 use GeminiLabs\SiteReviews\Modules\Notice;
 use GeminiLabs\SiteReviews\Review;
@@ -33,7 +30,7 @@ class SendVerificationEmail extends AbstractCommand
             $this->fail();
             return;
         }
-        if (!glsr(OptionManager::class)->getBool('settings.general.request_verification', false)) {
+        if (!glsr_get_option('settings.general.request_verification', false, 'bool')) {
             glsr(Notice::class)->addError(
                 _x('The email could not be sent because the Request Verification setting is disabled.', 'admin-text', 'site-reviews')
             );
@@ -53,6 +50,7 @@ class SendVerificationEmail extends AbstractCommand
         ]);
         if (!$email->send()) {
             glsr(Notice::class)->addError(
+                /* translators: %s: link to the Console page */
                 sprintf(_x('The email could not be sent, check the %s page for errors.', 'link to Console page (admin-text)', 'site-reviews'),
                     glsr_admin_link('tools.console')
                 )
@@ -76,34 +74,16 @@ class SendVerificationEmail extends AbstractCommand
 
     protected function buildEmail(string $recipient): array
     {
-        $context = glsr(TemplateTags::class)->tags($this->review, [
-            'include' => [
-                'review_assigned_links',
-                'review_assigned_posts',
-                'review_assigned_terms',
-                'review_assigned_users',
-                'review_author',
-                'review_categories',
-                'review_content',
-                'review_email',
-                'review_rating',
-                'review_title',
-                'site_title',
-                'site_url',
-            ],
+        $includedTags = Arr::consolidate(glsr()->settings['settings.general.request_verification_message']['tags'] ?? []);
+        $templateTags = glsr(TemplateTags::class)->tags($this->review, [
+            'include' => array_keys($includedTags),
         ]);
-        $context['verify_url'] = $this->verifyUrl; // use the provided verify_url with the redirect path
-        $template = trim(glsr(OptionManager::class)->get('settings.general.request_verification_message'));
-        if (!empty($template)) {
-            $templatePathForHook = 'request_verification_message';
-            $message = glsr(Template::class)->interpolate($template, $templatePathForHook, compact('context'));
-        } else {
-            glsr_log()->error('The request_verification_message setting is missing.');
-        }
+        $templateTags['verify_url'] = $this->verifyUrl; // use the provided verify_url with the redirect path
         return [
+            'message' => trim(glsr_get_option('general.request_verification_message', '', 'string')),
             'to' => $recipient,
             'subject' => __('Please verify your review', 'site-reviews'),
-            'message' => $message ?? '',
+            'template-tags' => $templateTags,
         ];
     }
 }
