@@ -2,6 +2,7 @@
 
 namespace GeminiLabs\SiteReviews\Commands;
 
+use GeminiLabs\League\Csv\Bom;
 use GeminiLabs\League\Csv\CannotInsertRecord;
 use GeminiLabs\League\Csv\CharsetConverter;
 use GeminiLabs\League\Csv\EscapeFormula;
@@ -11,6 +12,7 @@ use GeminiLabs\League\Csv\Reader;
 use GeminiLabs\League\Csv\Statement;
 use GeminiLabs\League\Csv\Writer;
 use GeminiLabs\SiteReviews\Database\ImportManager;
+use GeminiLabs\SiteReviews\Defaults\SubmittedFieldsDefaults;
 use GeminiLabs\SiteReviews\Exceptions\FileNotFoundException;
 use GeminiLabs\SiteReviews\Helpers\Arr;
 use GeminiLabs\SiteReviews\Helpers\Str;
@@ -75,7 +77,16 @@ class ProcessCsvFile extends AbstractCommand
             $this->fail();
             return;
         }
+        if (glsr(ImportManager::class)->locked()) {
+            glsr(Notice::class)->addError(
+                _x('Another import is already running. Please try again in a couple of minutes.', 'admin-text', 'site-reviews')
+            );
+            $this->fail();
+            return;
+        }
+        glsr(ImportManager::class)->lock();
         if (!$this->process($file)) {
+            glsr(ImportManager::class)->unlock();
             $this->fail();
         }
     }
@@ -98,7 +109,7 @@ class ProcessCsvFile extends AbstractCommand
             $date = \DateTime::createFromFormat('!'.$this->dateFormat, $record['date']);
             $record['date'] = $date->format('Y-m-d H:i:s'); // format the provided date
         }
-        if (1 === preg_match('#/'.glsr()->ID.'/avatars/[A-Z]+\.svg$#', $record['avatar'] ?? '')) {
+        if (1 === preg_match('#/'.glsr()->id.'/avatars/[A-Z]+\.svg$#', $record['avatar'] ?? '')) {
             $record['avatar'] = ''; // discard locally generated avatar SVG URLs
         }
         return $record;
@@ -119,13 +130,26 @@ class ProcessCsvFile extends AbstractCommand
             $filePath = glsr(ImportManager::class)->tempFilePath();
             $writer = $this->writer($filePath);
             $writer->insertOne($header);
-            $writer->addFormatter(fn (array $record) => $this->formatRecord($record));
-            $records = Statement::create()
-                ->where(fn (array $record) => !empty(array_filter($record, 'trim'))) // @phpstan-ignore-line remove empty rows
+            $records = (new Statement())
+                ->where(fn (array $record) => !empty(array_filter($record, 'trim'))) // remove empty rows
                 ->where(fn (array $record) => $this->validateRecord($record))
                 ->process($reader, $header);
             $writer->insertAll((function () use ($records) {
+                // Format and escape before hashing: the hash must see the record
+                // as stage 2 reads it back. The writer escapes again; EscapeFormula
+                // is idempotent.
+                $escaper = new EscapeFormula();
+                $staged = [];
                 foreach ($records as $record) {
+                    $record = $this->formatRecord($record);
+                    $record = $escaper->escapeRecord($record);
+                    $hash = $this->submittedHash($record);
+                    if (isset($staged[$hash])) {
+                        $this->errors['duplicate'] = _x('Duplicate row', 'admin-text', 'site-reviews');
+                        ++$this->skipped;
+                        continue;
+                    }
+                    $staged[$hash] = true;
                     ++$this->total; // count them on the way past: they are only read once
                     yield $record;
                 }
@@ -156,7 +180,7 @@ class ProcessCsvFile extends AbstractCommand
      */
     protected function reader(string $filepath): Reader
     {
-        $reader = Reader::createFromPath($filepath);
+        $reader = Reader::from($filepath);
         if (empty($this->delimiter)) {
             $delimiters = Info::getDelimiterStats($reader, static::ALLOWED_DELIMITERS);
             $delimiters = array_keys(array_filter($delimiters));
@@ -170,14 +194,26 @@ class ProcessCsvFile extends AbstractCommand
         $reader->skipEmptyRecords();
         $reader->addFormatter(fn (array $record) => array_map('trim', $record));
         if ($reader->supportsStreamFilterOnRead()) {
-            $inputBom = $reader->getInputBOM();
-            if (in_array($inputBom, [Reader::BOM_UTF16_LE, Reader::BOM_UTF16_BE], true)) {
-                return CharsetConverter::addTo($reader, 'utf-16', 'utf-8'); // @phpstan-ignore-line
-            } elseif (in_array($inputBom, [Reader::BOM_UTF32_LE, Reader::BOM_UTF32_BE], true)) {
-                return CharsetConverter::addTo($reader, 'utf-32', 'utf-8'); // @phpstan-ignore-line
+            $bom = Bom::tryFromSequence($reader);
+            // A UTF-8 BOM needs no transcoding, so only UTF-16 and UTF-32 are converted.
+            // addTo() appends the filter to the reader and hands back the same object.
+            if (null !== $bom && ($bom->isUtf16() || $bom->isUtf32())) {
+                CharsetConverter::addTo($reader, $bom->encoding(), 'utf-8');
             }
         }
         return $reader;
+    }
+
+    /**
+     * The staging copy of CreateReview::submitted()'s hash. It hashes the
+     * request before the review/request action fires, so rows that only a
+     * listener mutation makes identical are left to the stage 2 lookup.
+     */
+    protected function submittedHash(array $record): string
+    {
+        $values = (new Request($record))->toArray();
+        $values = glsr(SubmittedFieldsDefaults::class)->filter($values);
+        return md5(maybe_serialize($values));
     }
 
     protected function validateFile(UploadedFile $file): bool
@@ -219,8 +255,8 @@ class ProcessCsvFile extends AbstractCommand
 
     protected function writer(string $filePath): Writer
     {
-        $writer = Writer::createFromPath($filePath, 'w+');
-        $writer->addFormatter(new EscapeFormula());
+        $writer = Writer::from($filePath, 'w+');
+        $writer->addFormatter((new EscapeFormula())->escapeRecord(...));
         return $writer;
     }
 }

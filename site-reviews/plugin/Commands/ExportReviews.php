@@ -45,7 +45,7 @@ class ExportReviews extends AbstractCommand
             $writer = $this->writer();
             $writer->insertOne(array_keys($firstRecord));
             $writer->insertAll($records);
-            $writer->output($filename);
+            $writer->download($filename);
             glsr_exit();
         } catch (CannotInsertRecord $e) {
             $this->fail();
@@ -113,7 +113,7 @@ class ExportReviews extends AbstractCommand
         $meta = array_map(fn ($val) => $val[0] ?? '', $meta);
         $meta = array_filter($meta, function ($key) use ($additionalKeys) {
             return str_starts_with($key, '_custom_') || in_array($key, $additionalKeys);
-        }, ARRAY_FILTER_USE_KEY);
+        }, \ARRAY_FILTER_USE_KEY);
         $results = [];
         foreach ($meta as $key => $value) {
             $key = Str::removePrefix($key, '_');
@@ -135,8 +135,8 @@ class ExportReviews extends AbstractCommand
 
     protected function writer(): Writer
     {
-        $writer = Writer::createFromString('');
-        $writer->addFormatter(new EscapeFormula());
+        $writer = Writer::fromString('');
+        $writer->addFormatter((new EscapeFormula())->escapeRecord(...));
         return $writer;
     }
 }

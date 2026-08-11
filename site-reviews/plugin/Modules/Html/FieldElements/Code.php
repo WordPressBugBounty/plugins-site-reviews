@@ -3,6 +3,7 @@
 namespace GeminiLabs\SiteReviews\Modules\Html\FieldElements;
 
 use GeminiLabs\SiteReviews\Arguments;
+use GeminiLabs\SiteReviews\Modules\Html\SettingField;
 
 class Code extends AbstractFieldElement
 {
@@ -18,11 +19,17 @@ class Code extends AbstractFieldElement
 
     public function required(): array
     {
+        $field = $this->field;
+        $autosize = $field instanceof SettingField && $field->autosize;
         $locations = [
-            'setting' => $this->field->autosize ? 'autosized' : '',
+            'setting' => $autosize ? 'autosized' : '',
+        ];
+        $styles = [
+            'setting' => $autosize ? $this->autosizeStyle() : '',
         ];
         return [
             'class' => $locations[$this->field->location()] ?? '',
+            'style' => $styles[$this->field->location()] ?? '',
             'type' => 'textarea',
         ];
     }
@@ -30,6 +37,13 @@ class Code extends AbstractFieldElement
     public function tag(): string
     {
         return 'textarea';
+    }
+
+    protected function autosizeStyle(): string
+    {
+        // CSS field-sizing ignores the rows attribute. Set the start height from it.
+        $rows = max(2, (int) $this->field->rows);
+        return "min-height:{$rows}lh";
     }
 
     protected function buildSettingField(Arguments $args): string

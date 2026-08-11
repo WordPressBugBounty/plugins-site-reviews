@@ -27,9 +27,9 @@ msgstr[1] "%s stars or less"
 
 #: config/settings.php:438
 #: plugin/Integrations/ProfilePress/Controllers/AccountController.php:55
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:82
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:83
 #: plugin/Integrations/UltimateMember/Controllers/AccountController.php:54
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:64
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:65
 #: plugin/Modules/Html/ReviewsHtml.php:113
 msgid "There are no reviews yet. Be the first one to write one."
 msgstr "There are no reviews yet. Be the first one to write one."
@@ -111,11 +111,11 @@ msgstr "Close Modal"
 msgid "Please verify your review"
 msgstr "Please verify your review"
 
-#: plugin/Controllers/VerificationController.php:95
+#: plugin/Controllers/VerificationController.php:96
 msgid "Thank you, your review has been verified."
 msgstr "Thank you, your review has been verified."
 
-#: plugin/Controllers/VerificationController.php:96
+#: plugin/Controllers/VerificationController.php:97
 msgid "Thank you, your review has been verified and is awaiting approval."
 msgstr "Thank you, your review has been verified and is awaiting approval."
 
@@ -208,11 +208,11 @@ msgstr "The review could not be submitted because this browser is too old. Pleas
 msgid "and"
 msgstr "and"
 
-#: plugin/Helpers/Text.php:165
+#: plugin/Helpers/Text.php:167
 msgid "Show less"
 msgstr "Show less"
 
-#: plugin/Helpers/Text.php:166
+#: plugin/Helpers/Text.php:168
 msgid "Show more"
 msgstr "Show more"
 
@@ -347,8 +347,8 @@ msgid_plural "%s customer reviews"
 msgstr[0] "%s customer review"
 msgstr[1] "%s customer reviews"
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:55
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:41
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:56
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:42
 #: templates/woocommerce/reviews.php:14
 msgid "Reviews"
 msgstr "Reviews"
@@ -454,7 +454,7 @@ msgid "The CAPTCHA verification failed, please try again."
 msgstr "The CAPTCHA verification failed, please try again."
 
 #: plugin/Modules/Validator/CustomValidator.php:21
-#: views/pages/documentation/support/common-problems-and-solutions.php:125
+#: views/pages/documentation/support/common-problems-and-solutions.php:127
 msgid "The review submission failed. Please notify the site administrator."
 msgstr "The review submission failed. Please notify the site administrator."
 
@@ -490,39 +490,39 @@ msgstr "by %s"
 msgid "You have not written any reviews."
 msgstr "You have not written any reviews."
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:86
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:68
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:87
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:69
 msgid "You have not received any reviews."
 msgstr "You have not received any reviews."
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:87
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:69
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:88
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:70
 msgid "This person has not received any reviews."
 msgstr "This person has not received any reviews."
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:123
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:93
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:124
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:94
 msgid "Your rating"
 msgstr "Your rating"
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:124
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:94
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:125
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:95
 msgid "User rating"
 msgstr "User rating"
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:137
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:107
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:138
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:108
 msgid "No one has reviewed you yet."
 msgstr "No one has reviewed you yet."
 
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:139
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:109
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:140
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:110
 msgid "No one has reviewed this person yet."
 msgstr "No one has reviewed this person yet."
 
 #. translators: %s: a login link with the text "logged in"
-#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:200
-#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:163
+#: plugin/Integrations/ProfilePress/Controllers/ProfileController.php:201
+#: plugin/Integrations/UltimateMember/Controllers/ProfileController.php:164
 #, php-format
 msgid "You must be %s to review this person."
 msgstr "You must be %s to review this person."
@@ -581,7 +581,7 @@ msgstr "No Title"
 msgid "Verified"
 msgstr "Verified"
 
-#: views/pages/documentation/support/common-problems-and-solutions.php:131
+#: views/pages/documentation/support/common-problems-and-solutions.php:133
 msgid "Service Unavailable."
 msgstr "Service Unavailable."
 
@@ -1374,7 +1374,7 @@ msgid "If you are sending notifications to Slack then this template will only be
 msgstr "If you are sending notifications to Slack then this template will only be used as a fallback in the event that <a href=\"https://api.slack.com/docs/attachments\" target=\"_blank\">Message Attachments</a> have been disabled."
 
 #: config/settings.php:260
-#: views/pages/tools/general/import-reviews.php:85
+#: views/pages/tools/general/import-reviews.php:83
 msgctxt "admin-text"
 msgid "Date Format"
 msgstr "Date Format"
@@ -1804,7 +1804,7 @@ msgstr "You can use the %s to override this value on your page. The Custom Field
 #: config/settings.php:743
 #: config/settings.php:758
 #: config/settings.php:772
-#: views/pages/settings/schema.php:28
+#: views/pages/settings/schema.php:26
 msgctxt "admin-text"
 msgid "Custom Fields metabox"
 msgstr "Custom Fields metabox"
@@ -2449,13 +2449,13 @@ msgctxt "admin-text"
 msgid "Enabling this option will persist field values entered into the review form until either the review is submitted or the browser tab or window is closed."
 msgstr "Enabling this option will persist field values entered into the review form until either the review is submitted or the browser tab or window is closed."
 
-#: plugin/Database.php:238
+#: plugin/Database.php:237
 msgctxt "admin-text"
 msgid "(no title)"
 msgstr "(no title)"
 
 #: plugin/Controllers/ListTableColumns/ColumnValueAuthorName.php:17
-#: plugin/Review.php:348
+#: plugin/Review.php:331
 msgctxt "admin-text"
 msgid "Unknown"
 msgstr "Unknown"
@@ -2481,12 +2481,12 @@ msgid "Deactivation Details"
 msgstr "Deactivation Details"
 
 #: plugin/Controllers/WelcomeController.php:63
-#: views/tmpl-deactivate-plugin.php:33
+#: views/tmpl-deactivate-plugin.php:32
 msgctxt "admin-text"
 msgid "Getting Started"
 msgstr "Getting Started"
 
-#: views/tmpl-deactivate-plugin.php:44
+#: views/tmpl-deactivate-plugin.php:42
 msgctxt "admin-text"
 msgid "addons"
 msgstr "addons"
@@ -2854,9 +2854,9 @@ msgid "This will completely replace the default WooCommerce review system with S
 msgstr "This will completely replace the default WooCommerce review system with Site Reviews. If you have existing WooCommerce comment reviews, you may need to first export them to a CSV file, and then import them using the %s tool."
 
 #: config/integrations/woocommerce.php:10
-#: views/integrations/woocommerce/tools/import-product-reviews.php:35
+#: views/integrations/woocommerce/tools/import-product-reviews.php:33
 #: views/pages/tools/general/import-reviews.php:6
-#: views/pages/tools/general/import-reviews.php:120
+#: views/pages/tools/general/import-reviews.php:118
 msgctxt "admin-text"
 msgid "Import Reviews"
 msgstr "Import Reviews"
@@ -3250,7 +3250,7 @@ msgid "Imported %d attachments"
 msgstr "Imported %d attachments"
 
 #. translators: %s: number of imported reviews
-#: plugin/Commands/ImportReviewsCleanup.php:47
+#: plugin/Commands/ImportReviewsCleanup.php:48
 #: plugin/Integrations/WooCommerce/Commands/ImportProductReviewsCleanup.php:44
 #, php-format
 msgctxt "admin-text"
@@ -3260,7 +3260,7 @@ msgstr[0] "%s review was imported."
 msgstr[1] "%s reviews were imported."
 
 #. translators: %s: number of skipped entries
-#: plugin/Commands/ImportReviewsCleanup.php:56
+#: plugin/Commands/ImportReviewsCleanup.php:57
 #: plugin/Integrations/WooCommerce/Commands/ImportProductReviewsCleanup.php:52
 #, php-format
 msgctxt "admin-text"
@@ -3270,7 +3270,7 @@ msgstr[0] "%s entry was skipped."
 msgstr[1] "%s entries were skipped."
 
 #. translators: %s: list of warning messages
-#: plugin/Commands/ImportReviewsCleanup.php:64
+#: plugin/Commands/ImportReviewsCleanup.php:65
 #: plugin/Integrations/WooCommerce/Commands/ImportProductReviewsCleanup.php:59
 #, php-format
 msgctxt "admin-text"
@@ -3301,59 +3301,59 @@ msgctxt "admin-text"
 msgid "All plugin migrations have been run successfully, please %s the page."
 msgstr "All plugin migrations have been run successfully, please %s the page."
 
-#: plugin/Commands/ProcessCsvFile.php:117
+#: plugin/Commands/ProcessCsvFile.php:128
 msgctxt "admin-text"
 msgid "The CSV file could not be imported. Please verify the following details and try again:"
 msgstr "The CSV file could not be imported. Please verify the following details and try again:"
 
-#: plugin/Commands/ProcessCsvFile.php:136
+#: plugin/Commands/ProcessCsvFile.php:160
 msgctxt "admin-text"
 msgid "Unable to process a row in the CSV document:"
 msgstr "Unable to process a row in the CSV document:"
 
-#: plugin/Commands/ProcessCsvFile.php:141
+#: plugin/Commands/ProcessCsvFile.php:165
 msgctxt "admin-text"
 msgid "Does the CSV file include all required columns?"
 msgstr "Does the CSV file include all required columns?"
 
-#: plugin/Commands/ProcessCsvFile.php:142
+#: plugin/Commands/ProcessCsvFile.php:166
 msgctxt "admin-text"
 msgid "Have you named all of the columns in the CSV file?"
 msgstr "Have you named all of the columns in the CSV file?"
 
-#: plugin/Commands/ProcessCsvFile.php:143
+#: plugin/Commands/ProcessCsvFile.php:167
 msgctxt "admin-text"
 msgid "Have you removed all empty columns from the CSV file?"
 msgstr "Have you removed all empty columns from the CSV file?"
 
-#: plugin/Commands/ProcessCsvFile.php:144
+#: plugin/Commands/ProcessCsvFile.php:168
 msgctxt "admin-text"
 msgid "Have you selected the correct delimiter?"
 msgstr "Have you selected the correct delimiter?"
 
-#: plugin/Commands/ProcessCsvFile.php:145
+#: plugin/Commands/ProcessCsvFile.php:169
 msgctxt "admin-text"
 msgid "Is the CSV file encoded as UTF-8?"
 msgstr "Is the CSV file encoded as UTF-8?"
 
-#: plugin/Commands/ProcessCsvFile.php:164
+#: plugin/Commands/ProcessCsvFile.php:188
 msgctxt "admin-text"
 msgid "Cannot detect the delimiter used in the CSV file (supported delimiters are comma and semicolon)."
 msgstr "Cannot detect the delimiter used in the CSV file (supported delimiters are comma and semicolon)."
 
 #. translators: %s: detected mime type
-#: plugin/Commands/ProcessCsvFile.php:192
+#: plugin/Commands/ProcessCsvFile.php:228
 #, php-format
 msgctxt "admin-text"
 msgid "The import file does not look like a valid CSV file (detected: %s). If this is incorrect, make sure that your server is configured to detect mime types."
 msgstr "The import file does not look like a valid CSV file (detected: %s). If this is incorrect, make sure that your server is configured to detect mime types."
 
-#: plugin/Commands/ProcessCsvFile.php:211
+#: plugin/Commands/ProcessCsvFile.php:247
 msgctxt "admin-text"
 msgid "Incorrect date format"
 msgstr "Incorrect date format"
 
-#: plugin/Commands/ProcessCsvFile.php:212
+#: plugin/Commands/ProcessCsvFile.php:248
 msgctxt "admin-text"
 msgid "Empty or invalid rating"
 msgstr "Empty or invalid rating"
@@ -3414,7 +3414,7 @@ msgid "The verification request email was sent."
 msgstr "The verification request email was sent."
 
 #: plugin/Commands/SendVerificationEmail.php:71
-#: plugin/Controllers/VerificationController.php:33
+#: plugin/Controllers/VerificationController.php:34
 msgctxt "admin-text"
 msgid "Resend Verification Request"
 msgstr "Resend Verification Request"
@@ -3492,11 +3492,10 @@ msgctxt "admin-text"
 msgid "Try Premium"
 msgstr "Try Premium"
 
-#. translators: %s: link with the text "Import"
 #: plugin/Controllers/AdminController.php:222
-#: views/integrations/woocommerce/settings.php:8
+#: views/integrations/woocommerce/settings.php:7
 #: views/pages/tools/general/export-reviews.php:19
-#: views/pages/tools/general/import-reviews.php:26
+#: views/pages/tools/general/import-reviews.php:24
 msgctxt "admin-text"
 msgid "Import"
 msgstr "Import"
@@ -3943,7 +3942,7 @@ msgctxt "admin-text"
 msgid "A valid <a href=\"%s\">license key</a> is required to update this plugin."
 msgstr "A valid <a href=\"%s\">license key</a> is required to update this plugin."
 
-#: plugin/Controllers/VerificationController.php:34
+#: plugin/Controllers/VerificationController.php:35
 msgctxt "admin-text"
 msgid "Send Verification Request"
 msgstr "Send Verification Request"
@@ -5608,9 +5607,8 @@ msgctxt "admin-text"
 msgid "WooCommerce integration"
 msgstr "WooCommerce integration"
 
-#. translators: %s: link with the text "Learn how to"
-#: views/integrations/profilepress/settings.php:8
-#: views/integrations/surecart/settings.php:8
+#: views/integrations/profilepress/settings.php:7
+#: views/integrations/surecart/settings.php:7
 msgctxt "admin-text"
 msgid "Learn how to"
 msgstr "Learn how to"
@@ -5745,20 +5743,20 @@ msgctxt "admin-text"
 msgid "JSON-LD Schema Settings"
 msgstr "JSON-LD Schema Settings"
 
-#: views/pages/settings/schema.php:7
+#: views/pages/settings/schema.php:6
 msgctxt "admin-text"
 msgid "<strong>The schema is disabled by default.</strong> Use the schema option in your blocks or shortcodes to enable it."
 msgstr "<strong>The schema is disabled by default.</strong> Use the schema option in your blocks or shortcodes to enable it."
 
 #. translators: %s: link with the text "Google Rich Results"
-#: views/pages/settings/schema.php:21
+#: views/pages/settings/schema.php:19
 #, php-format
 msgctxt "admin-text"
 msgid "The schema is used to display rich review snippets in Google's search results. If the schema has been enabled, you can use the %s tool to test your pages for valid schema."
 msgstr "The schema is used to display rich review snippets in Google's search results. If the schema has been enabled, you can use the %s tool to test your pages for valid schema."
 
 #. translators: %s: link with the text "Google Rich Results"
-#: views/pages/settings/schema.php:22
+#: views/pages/settings/schema.php:20
 msgctxt "admin-text"
 msgid "Google Rich Results"
 msgstr "Google Rich Results"
@@ -5769,38 +5767,38 @@ msgid "Custom Text Settings"
 msgstr "Custom Text Settings"
 
 #. translators: %s: link to the Loco Translate plugin
-#: views/pages/settings/strings.php:7
+#: views/pages/settings/strings.php:6
 #, php-format
 msgctxt "admin-text"
 msgid "If you have a multilingual website, use the %s plugin instead. When Loco Translate asks for the location of the new translation file, select \"Custom\"."
 msgstr "If you have a multilingual website, use the %s plugin instead. When Loco Translate asks for the location of the new translation file, select \"Custom\"."
 
-#: views/pages/settings/strings.php:12
+#: views/pages/settings/strings.php:13
 msgctxt "admin-text"
 msgid "Here you can customise any English text of the plugin that is shown on the frontend of your website, including the field labels and placeholders of the review form."
 msgstr "Here you can customise any English text of the plugin that is shown on the frontend of your website, including the field labels and placeholders of the review form."
 
-#: views/pages/settings/strings.php:13
+#: views/pages/settings/strings.php:14
 msgctxt "admin-text"
 msgid "If you are using the Polylang plugin, any custom text you enter here will be translatable on the Polylang \"Strings translations\" page."
 msgstr "If you are using the Polylang plugin, any custom text you enter here will be translatable on the Polylang \"Strings translations\" page."
 
-#: views/pages/settings/strings.php:18
+#: views/pages/settings/strings.php:19
 msgctxt "admin-text"
 msgid "Search here for translatable text"
 msgstr "Search here for translatable text"
 
-#: views/pages/settings/strings.php:21
+#: views/pages/settings/strings.php:22
 msgctxt "admin-text"
 msgid "Search here for text to change..."
 msgstr "Search here for text to change..."
 
-#: views/pages/settings/strings.php:28
+#: views/pages/settings/strings.php:29
 msgctxt "admin-text"
 msgid "Original Text"
 msgstr "Original Text"
 
-#: views/pages/settings/strings.php:29
+#: views/pages/settings/strings.php:30
 msgctxt "admin-text"
 msgid "Custom Text"
 msgstr "Custom Text"
@@ -5886,7 +5884,7 @@ msgctxt "admin-text"
 msgid "Please wait..."
 msgstr "Please wait..."
 
-#: views/pages/tools/scheduled.php:5
+#: views/pages/tools/scheduled.php:4
 msgctxt "admin-text"
 msgid "Site Reviews includes and uses the versatile <a href=\"https://actionscheduler.org\" target=\"_blank\">Action Scheduler</a> library to manage and schedule cron jobs in WordPress and improve your site’s overall ability to process large tasks. Many other popular WordPress plugins like WooCommerce, RankMath, WPForms, and All in One SEO also rely on Action Scheduler to execute actions more efficiently."
 msgstr "Site Reviews includes and uses the versatile <a href=\"https://actionscheduler.org\" target=\"_blank\">Action Scheduler</a> library to manage and schedule cron jobs in WordPress and improve your site’s overall ability to process large tasks. Many other popular WordPress plugins like WooCommerce, RankMath, WPForms, and All in One SEO also rely on Action Scheduler to execute actions more efficiently."
@@ -5933,7 +5931,6 @@ msgctxt "admin-text"
 msgid "Enter a valid license key for automatic updates."
 msgstr "Enter a valid license key for automatic updates."
 
-#. translators: %s: link with the text "login"
 #: views/partials/addons/support-notice.php:6
 msgctxt "admin-text"
 msgid "login"
@@ -6046,7 +6043,7 @@ msgctxt "admin-text"
 msgid "Common Problems and Solutions"
 msgstr "Common Problems and Solutions"
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:51
+#: views/integrations/woocommerce/tools/import-product-reviews.php:49
 #: views/pages/tools/general/migrate-plugin.php:21
 #: views/pages/tools/general/migrate-plugin.php:29
 #: views/partials/notices/migration.php:18
@@ -6266,45 +6263,45 @@ msgctxt "admin-text"
 msgid "Max Width"
 msgstr "Max Width"
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:33
+#: plugin/Controllers/Api/Version1/RestReviewController.php:34
 msgctxt "admin-text"
 msgid "Review creation failed, please check the Site Reviews console log for more details."
 msgstr "Review creation failed, please check the Site Reviews console log for more details."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:60
-#: plugin/Controllers/Api/Version1/RestReviewController.php:78
+#: plugin/Controllers/Api/Version1/RestReviewController.php:61
+#: plugin/Controllers/Api/Version1/RestReviewController.php:79
 msgctxt "admin-text"
 msgid "The review cannot be deleted."
 msgstr "The review cannot be deleted."
 
 #. translators: %s: force=true
-#: plugin/Controllers/Api/Version1/RestReviewController.php:70
+#: plugin/Controllers/Api/Version1/RestReviewController.php:71
 #, php-format
 msgctxt "admin-text"
 msgid "The review does not support trashing. Set \"%s\" to delete."
 msgstr "The review does not support trashing. Set \"%s\" to delete."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:74
+#: plugin/Controllers/Api/Version1/RestReviewController.php:75
 msgctxt "admin-text"
 msgid "The review has already been deleted."
 msgstr "The review has already been deleted."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:148
+#: plugin/Controllers/Api/Version1/RestReviewController.php:149
 msgctxt "admin-text"
 msgid "The page number requested is larger than the number of pages available."
 msgstr "The page number requested is larger than the number of pages available."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:203
+#: plugin/Controllers/Api/Version1/RestReviewController.php:204
 msgctxt "admin-text"
 msgid "Unique identifier for the object."
 msgstr "Unique identifier for the object."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:226
+#: plugin/Controllers/Api/Version1/RestReviewController.php:227
 msgctxt "admin-text"
 msgid "Whether to bypass Trash and force deletion."
 msgstr "Whether to bypass Trash and force deletion."
 
-#: plugin/Controllers/Api/Version1/RestReviewController.php:246
+#: plugin/Controllers/Api/Version1/RestReviewController.php:247
 msgctxt "admin-text"
 msgid "Review update failed, please check the Site Reviews console log for more details."
 msgstr "Review update failed, please check the Site Reviews console log for more details."
@@ -6314,7 +6311,7 @@ msgctxt "admin-text"
 msgid "Sorry, you are not allowed to do that."
 msgstr "Sorry, you are not allowed to do that."
 
-#: plugin/Controllers/Api/Version1/RestSummaryController.php:77
+#: plugin/Controllers/Api/Version1/RestSummaryController.php:78
 msgctxt "admin-text"
 msgid "Sorry, you are not allowed to view rating summaries."
 msgstr "Sorry, you are not allowed to view rating summaries."
@@ -6551,8 +6548,8 @@ msgctxt "admin-text"
 msgid "Hide value"
 msgstr "Hide value"
 
-#: plugin/Modules/Html/FieldElements/Textarea.php:45
-#: plugin/Modules/Html/FieldElements/Textarea.php:48
+#: plugin/Modules/Html/FieldElements/Textarea.php:59
+#: plugin/Modules/Html/FieldElements/Textarea.php:62
 msgctxt "admin-text"
 msgid "Reset value to default"
 msgstr "Reset value to default"
@@ -6605,53 +6602,53 @@ msgctxt "admin-text"
 msgid "Import Product Reviews"
 msgstr "Import Product Reviews"
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:14
+#: views/integrations/woocommerce/tools/import-product-reviews.php:13
 msgctxt "admin-text"
 msgid "Reviews are only imported once so it's safe to run this tool multiple times."
 msgstr "Reviews are only imported once so it's safe to run this tool multiple times."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:19
+#: views/integrations/woocommerce/tools/import-product-reviews.php:17
 msgctxt "admin-text"
 msgid "If you decide to return to using WooCommerce reviews, you will need to click the \"Revert\" button to restore the previous product rating counts."
 msgstr "If you decide to return to using WooCommerce reviews, you will need to click the \"Revert\" button to restore the previous product rating counts."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:24
+#: views/integrations/woocommerce/tools/import-product-reviews.php:22
 msgctxt "admin-text"
 msgid "Step 1:"
 msgstr "Step 1:"
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:25
+#: views/integrations/woocommerce/tools/import-product-reviews.php:23
 msgctxt "admin-text"
 msgid "Import your WooCommerce product reviews. Review replies and comments will be skipped."
 msgstr "Import your WooCommerce product reviews. Review replies and comments will be skipped."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:33
-#: views/pages/tools/general/import-reviews.php:118
+#: views/integrations/woocommerce/tools/import-product-reviews.php:31
+#: views/pages/tools/general/import-reviews.php:116
 msgctxt "admin-text"
 msgid "Importing reviews, please wait..."
 msgstr "Importing reviews, please wait..."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:41
+#: views/integrations/woocommerce/tools/import-product-reviews.php:39
 msgctxt "admin-text"
 msgid "Step 2:"
 msgstr "Step 2:"
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:42
+#: views/integrations/woocommerce/tools/import-product-reviews.php:40
 msgctxt "admin-text"
 msgid "Migrate the product rating counts. This allows third-party plugins to filter your products by rating."
 msgstr "Migrate the product rating counts. This allows third-party plugins to filter your products by rating."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:53
+#: views/integrations/woocommerce/tools/import-product-reviews.php:51
 msgctxt "admin-text"
 msgid "Migrate Product Ratings"
 msgstr "Migrate Product Ratings"
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:59
+#: views/integrations/woocommerce/tools/import-product-reviews.php:57
 msgctxt "admin-text"
 msgid "Reverting, please wait..."
 msgstr "Reverting, please wait..."
 
-#: views/integrations/woocommerce/tools/import-product-reviews.php:61
+#: views/integrations/woocommerce/tools/import-product-reviews.php:59
 msgctxt "admin-text"
 msgid "Revert"
 msgstr "Revert"
@@ -6661,57 +6658,57 @@ msgctxt "admin-text"
 msgid "Configure IP Address Detection"
 msgstr "Configure IP Address Detection"
 
-#: views/pages/tools/general/configure-ip-detection.php:25
+#: views/pages/tools/general/configure-ip-detection.php:24
 msgctxt "admin-text"
 msgid "Be careful when enabling a proxy HTTP header if you do not have a front-end proxy configuration because it may allow visitors to spoof their IP address."
 msgstr "Be careful when enabling a proxy HTTP header if you do not have a front-end proxy configuration because it may allow visitors to spoof their IP address."
 
-#: views/pages/tools/general/configure-ip-detection.php:30
+#: views/pages/tools/general/configure-ip-detection.php:28
 msgctxt "admin-text"
 msgid "If you are unsure which proxy HTTP header to use, contact the technical support staff of your hosting provider and read their documentation to determine the correct configuration for your website."
 msgstr "If you are unsure which proxy HTTP header to use, contact the technical support staff of your hosting provider and read their documentation to determine the correct configuration for your website."
 
-#: views/pages/tools/general/configure-ip-detection.php:33
+#: views/pages/tools/general/configure-ip-detection.php:31
 msgctxt "admin-text"
 msgid "When a review is submitted on your website, Site Reviews detects the IP address of the person submitting it and saves it to the review. Site Reviews uses the IP address in the review limits and blacklist settings, and the Akismet and Captcha integrations to catch spam submissions."
 msgstr "When a review is submitted on your website, Site Reviews detects the IP address of the person submitting it and saves it to the review. Site Reviews uses the IP address in the review limits and blacklist settings, and the Akismet and Captcha integrations to catch spam submissions."
 
-#: views/pages/tools/general/configure-ip-detection.php:34
+#: views/pages/tools/general/configure-ip-detection.php:32
 msgctxt "admin-text"
 msgid "If you get incorrect IP address values in your reviews, there might be a reverse proxy, load balancer, cache, Cloudflare, CDN, or any other type of proxy in front of your web server that \"proxies\" traffic to your website. If so, select the proxy HTTP header that contains the real visitor IP address."
 msgstr "If you get incorrect IP address values in your reviews, there might be a reverse proxy, load balancer, cache, Cloudflare, CDN, or any other type of proxy in front of your web server that \"proxies\" traffic to your website. If so, select the proxy HTTP header that contains the real visitor IP address."
 
-#: views/pages/tools/general/configure-ip-detection.php:42
+#: views/pages/tools/general/configure-ip-detection.php:40
 msgctxt "admin-text"
 msgid "Proxy HTTP Header"
 msgstr "Proxy HTTP Header"
 
-#: views/pages/tools/general/configure-ip-detection.php:60
+#: views/pages/tools/general/configure-ip-detection.php:58
 msgctxt "admin-text"
 msgid "Trusted Proxies"
 msgstr "Trusted Proxies"
 
-#: views/pages/tools/general/configure-ip-detection.php:65
+#: views/pages/tools/general/configure-ip-detection.php:63
 msgctxt "admin-text"
 msgid "These IPs (or CIDR ranges) will be ignored when determining the requesting IP via the selected proxy HTTP header. Enter one IP or CIDR range per line."
 msgstr "These IPs (or CIDR ranges) will be ignored when determining the requesting IP via the selected proxy HTTP header. Enter one IP or CIDR range per line."
 
-#: views/pages/tools/general/configure-ip-detection.php:73
+#: views/pages/tools/general/configure-ip-detection.php:71
 msgctxt "admin-text"
 msgid "Saving, please wait..."
 msgstr "Saving, please wait..."
 
-#: views/pages/tools/general/configure-ip-detection.php:74
+#: views/pages/tools/general/configure-ip-detection.php:72
 msgctxt "admin-text"
 msgid "Save"
 msgstr "Save"
 
-#: views/pages/tools/general/configure-ip-detection.php:80
+#: views/pages/tools/general/configure-ip-detection.php:78
 msgctxt "admin-text"
 msgid "Testing, please wait..."
 msgstr "Testing, please wait..."
 
-#: views/pages/tools/general/configure-ip-detection.php:81
+#: views/pages/tools/general/configure-ip-detection.php:79
 msgctxt "admin-text"
 msgid "Test IP Address Detection"
 msgstr "Test IP Address Detection"
@@ -6723,7 +6720,7 @@ msgid "Export Reviews"
 msgstr "Export Reviews"
 
 #: views/pages/tools/general/export-reviews.php:18
-#: views/pages/tools/general/import-reviews.php:25
+#: views/pages/tools/general/import-reviews.php:23
 msgctxt "admin-text"
 msgid "Export"
 msgstr "Export"
@@ -6787,93 +6784,93 @@ msgctxt "admin-text"
 msgid "Please backup your database before running this tool! You can use the %s plugin to do this."
 msgstr "Please backup your database before running this tool! You can use the %s plugin to do this."
 
-#: views/pages/tools/general/import-reviews.php:17
+#: views/pages/tools/general/import-reviews.php:16
 msgctxt "admin-text"
 msgid "Any entry in the CSV file that does not contain a required column value will be skipped."
 msgstr "Any entry in the CSV file that does not contain a required column value will be skipped."
 
-#: views/pages/tools/general/import-reviews.php:31
+#: views/pages/tools/general/import-reviews.php:29
 msgctxt "admin-text"
 msgid "Step 1: Download the CSV template file"
 msgstr "Step 1: Download the CSV template file"
 
-#: views/pages/tools/general/import-reviews.php:36
+#: views/pages/tools/general/import-reviews.php:34
 msgctxt "admin-text"
 msgid "Download"
 msgstr "Download"
 
-#: views/pages/tools/general/import-reviews.php:40
+#: views/pages/tools/general/import-reviews.php:38
 msgctxt "admin-text"
 msgid "Step 2: Enter reviews into the CSV file"
 msgstr "Step 2: Enter reviews into the CSV file"
 
-#: views/pages/tools/general/import-reviews.php:41
+#: views/pages/tools/general/import-reviews.php:39
 msgctxt "admin-text"
 msgid "Enter the reviews details into the template file and then save it. The CSV file should be encoded as UTF-8 and may contain the following columns:"
 msgstr "Enter the reviews details into the template file and then save it. The CSV file should be encoded as UTF-8 and may contain the following columns:"
 
-#: views/pages/tools/general/import-reviews.php:45
+#: views/pages/tools/general/import-reviews.php:43
 msgctxt "admin-text"
 msgid "Column Name"
 msgstr "Column Name"
 
-#: views/pages/tools/general/import-reviews.php:46
+#: views/pages/tools/general/import-reviews.php:44
 msgctxt "admin-text"
 msgid "Required"
 msgstr "Required"
 
-#: views/pages/tools/general/import-reviews.php:47
+#: views/pages/tools/general/import-reviews.php:45
 msgctxt "admin-text"
 msgid "Description"
 msgstr "Description"
 
-#: views/pages/tools/general/import-reviews.php:68
+#: views/pages/tools/general/import-reviews.php:66
 msgctxt "admin-text"
 msgid "Step 3: Upload the CSV file"
 msgstr "Step 3: Upload the CSV file"
 
-#: views/pages/tools/general/import-reviews.php:77
+#: views/pages/tools/general/import-reviews.php:75
 msgctxt "admin-text"
 msgid "Delimiter"
 msgstr "Delimiter"
 
-#: views/pages/tools/general/import-reviews.php:79
+#: views/pages/tools/general/import-reviews.php:77
 msgctxt "admin-text"
 msgid "Detect automatically"
 msgstr "Detect automatically"
 
-#: views/pages/tools/general/import-reviews.php:80
+#: views/pages/tools/general/import-reviews.php:78
 msgctxt "admin-text"
 msgid "Comma (,)"
 msgstr "Comma (,)"
 
-#: views/pages/tools/general/import-reviews.php:81
+#: views/pages/tools/general/import-reviews.php:79
 msgctxt "admin-text"
 msgid "Semicolon (;)"
 msgstr "Semicolon (;)"
 
-#: views/pages/tools/general/import-reviews.php:87
+#: views/pages/tools/general/import-reviews.php:85
 msgctxt "admin-text"
 msgid "Select the date format used in the reviews"
 msgstr "Select the date format used in the reviews"
 
-#: views/pages/tools/general/import-reviews.php:88
-#: views/pages/tools/general/import-reviews.php:96
-#: views/pages/tools/general/import-reviews.php:104
+#: views/pages/tools/general/import-reviews.php:86
+#: views/pages/tools/general/import-reviews.php:94
+#: views/pages/tools/general/import-reviews.php:102
 msgctxt "admin-text"
 msgid "Year"
 msgstr "Year"
 
-#: views/pages/tools/general/import-reviews.php:88
-#: views/pages/tools/general/import-reviews.php:96
-#: views/pages/tools/general/import-reviews.php:104
+#: views/pages/tools/general/import-reviews.php:86
+#: views/pages/tools/general/import-reviews.php:94
+#: views/pages/tools/general/import-reviews.php:102
 msgctxt "admin-text"
 msgid "Month"
 msgstr "Month"
 
-#: views/pages/tools/general/import-reviews.php:88
-#: views/pages/tools/general/import-reviews.php:96
-#: views/pages/tools/general/import-reviews.php:104
+#: views/pages/tools/general/import-reviews.php:86
+#: views/pages/tools/general/import-reviews.php:94
+#: views/pages/tools/general/import-reviews.php:102
 msgctxt "admin-text"
 msgid "Day"
 msgstr "Day"
@@ -6906,42 +6903,42 @@ msgid "Hard Reset"
 msgstr "Hard Reset"
 
 #: views/pages/tools/general/optimise-db-tables.php:9
-#: views/pages/tools/general/repair-review-relations.php:16
+#: views/pages/tools/general/repair-review-relations.php:17
 msgctxt "admin-text"
 msgid "Optimise Your Database Tables"
 msgstr "Optimise Your Database Tables"
 
-#: views/pages/tools/general/optimise-db-tables.php:54
+#: views/pages/tools/general/optimise-db-tables.php:55
 msgctxt "admin-text"
 msgid "Optimisation is unnecessary because your database tables already use the InnoDB engine!"
 msgstr "Optimisation is unnecessary because your database tables already use the InnoDB engine!"
 
-#: views/pages/tools/general/optimise-db-tables.php:21
+#: views/pages/tools/general/optimise-db-tables.php:22
 msgctxt "admin-text"
 msgid "The old MyISAM table engine in MySQL was replaced by the InnoDB engine as the default over 10 years ago! If your database tables still use the MyISAM engine, you are missing out on substantial performance and reliability gains that the InnoDB engine provides."
 msgstr "The old MyISAM table engine in MySQL was replaced by the InnoDB engine as the default over 10 years ago! If your database tables still use the MyISAM engine, you are missing out on substantial performance and reliability gains that the InnoDB engine provides."
 
-#: views/pages/tools/general/optimise-db-tables.php:22
+#: views/pages/tools/general/optimise-db-tables.php:23
 msgctxt "admin-text"
 msgid "Site Reviews makes use of specific InnoDB engine features in order to perform faster database queries. However, some of your database tables (shown below) are still using the old MyISAM engine. If you convert these tables to use the InnoDB engine, it will make Site Reviews perform faster."
 msgstr "Site Reviews makes use of specific InnoDB engine features in order to perform faster database queries. However, some of your database tables (shown below) are still using the old MyISAM engine. If you convert these tables to use the InnoDB engine, it will make Site Reviews perform faster."
 
-#: views/pages/tools/general/optimise-db-tables.php:26
+#: views/pages/tools/general/optimise-db-tables.php:27
 msgctxt "admin-text"
 msgid "Table"
 msgstr "Table"
 
-#: views/pages/tools/general/optimise-db-tables.php:27
+#: views/pages/tools/general/optimise-db-tables.php:28
 msgctxt "admin-text"
 msgid "Engine"
 msgstr "Engine"
 
-#: views/pages/tools/general/optimise-db-tables.php:43
+#: views/pages/tools/general/optimise-db-tables.php:44
 msgctxt "admin-text"
 msgid "Converting, please wait..."
 msgstr "Converting, please wait..."
 
-#: views/pages/tools/general/optimise-db-tables.php:44
+#: views/pages/tools/general/optimise-db-tables.php:45
 msgctxt "admin-text"
 msgid "Convert table engine to InnoDB"
 msgstr "Convert table engine to InnoDB"
@@ -6973,22 +6970,22 @@ msgctxt "admin-text"
 msgid "Repair Review Relations"
 msgstr "Repair Review Relations"
 
-#: views/pages/tools/general/repair-review-relations.php:20
+#: views/pages/tools/general/repair-review-relations.php:22
 msgctxt "admin-text"
 msgid "Site Reviews stores review details in a custom database table, these entries are linked to the review post type in the WordPress posts table using the review's Post ID."
 msgstr "Site Reviews stores review details in a custom database table, these entries are linked to the review post type in the WordPress posts table using the review's Post ID."
 
-#: views/pages/tools/general/repair-review-relations.php:21
+#: views/pages/tools/general/repair-review-relations.php:23
 msgctxt "admin-text"
 msgid "This tool will repair the review relationships in your database by removing any review details in the custom database table that do not point to a valid review."
 msgstr "This tool will repair the review relationships in your database by removing any review details in the custom database table that do not point to a valid review."
 
-#: views/pages/tools/general/repair-review-relations.php:28
+#: views/pages/tools/general/repair-review-relations.php:30
 msgctxt "admin-text"
 msgid "Repairing relations, please wait..."
 msgstr "Repairing relations, please wait..."
 
-#: views/pages/tools/general/repair-review-relations.php:29
+#: views/pages/tools/general/repair-review-relations.php:31
 msgctxt "admin-text"
 msgid "Repair Relations"
 msgstr "Repair Relations"
@@ -7015,24 +7012,23 @@ msgstr "Reset Meta Values"
 
 #. translators: %s: the selected plugin version
 #: views/pages/tools/general/rollback-plugin.php:7
-#: views/pages/tools/general/rollback-plugin.php:48
+#: views/pages/tools/general/rollback-plugin.php:46
 msgctxt "admin-text"
 msgid "Rollback Plugin"
 msgstr "Rollback Plugin"
 
-#. translators: %s: link with the text "contact us"
-#: views/pages/tools/general/rollback-plugin.php:24
+#: views/pages/tools/general/rollback-plugin.php:22
 msgctxt "admin-text"
 msgid "contact us"
 msgstr "contact us"
 
-#: views/pages/tools/general/rollback-plugin.php:39
+#: views/pages/tools/general/rollback-plugin.php:37
 msgctxt "admin-text"
 msgid "Rollback Version To"
 msgstr "Rollback Version To"
 
 #. translators: %s: the selected plugin version
-#: views/pages/tools/general/rollback-plugin.php:47
+#: views/pages/tools/general/rollback-plugin.php:45
 #, php-format
 msgctxt "admin-text"
 msgid "Rolling back to %s, please wait..."
@@ -7556,14 +7552,14 @@ msgid "File upload was stopped by a PHP extension."
 msgstr "File upload was stopped by a PHP extension."
 
 #. translators: %s: link with the text "Getting Started"
-#: views/tmpl-deactivate-plugin.php:32
+#: views/tmpl-deactivate-plugin.php:31
 #, php-format
 msgctxt "Getting Started (admin-text)"
 msgid "Did you read the %s guide?"
 msgstr "Did you read the %s guide?"
 
 #. translators: %s: link with the text "addons"
-#: views/tmpl-deactivate-plugin.php:43
+#: views/tmpl-deactivate-plugin.php:41
 #, php-format
 msgctxt "link to addons page (admin-text)"
 msgid "Maybe one of the %s provide this feature."
@@ -8195,21 +8191,21 @@ msgid "This hook is disabled because the %s is enabled. Please use the Site Revi
 msgstr "This hook is disabled because the %s is enabled. Please use the Site Reviews hook instead or disable the integration."
 
 #. translators: %s: link with the text "Learn how to"
-#: views/integrations/profilepress/settings.php:7
+#: views/integrations/profilepress/settings.php:6
 #, php-format
 msgctxt "Learn how to (admin-text)"
 msgid "%s display profile ratings in your Member Directory page."
 msgstr "%s display profile ratings in your Member Directory page."
 
 #. translators: %s: link with the text "Learn how to"
-#: views/integrations/surecart/settings.php:7
+#: views/integrations/surecart/settings.php:6
 #, php-format
 msgctxt "Learn how to (admin-text)"
 msgid "%s add reviews to your SureCart Shop and Product pages."
 msgstr "%s add reviews to your SureCart Shop and Product pages."
 
 #. translators: %s: link with the text "Import"
-#: views/integrations/woocommerce/settings.php:7
+#: views/integrations/woocommerce/settings.php:6
 #, php-format
 msgctxt "Import (admin-text)"
 msgid "%s your existing WooCommerce product reviews."
@@ -8303,21 +8299,21 @@ msgid "Here you can import the Site Reviews settings from a <code>*.json</code> 
 msgstr "Here you can import the Site Reviews settings from a <code>*.json</code> file. You can use the the %s tool to export these settings from another website."
 
 #. translators: %s: link with the text "Optimise Your Database Tables"
-#: views/pages/tools/general/repair-review-relations.php:15
+#: views/pages/tools/general/repair-review-relations.php:16
 #, php-format
 msgctxt "Optimise Your Database Tables (admin-text)"
 msgid "Once you have repaired the review relationships, it is recommended that you run the %s tool to prevent the problem from happening again."
 msgstr "Once you have repaired the review relationships, it is recommended that you run the %s tool to prevent the problem from happening again."
 
 #. translators: %s: link with the text "contact us"
-#: views/pages/tools/general/rollback-plugin.php:23
+#: views/pages/tools/general/rollback-plugin.php:21
 #, php-format
 msgctxt "submit a support request (admin-text)"
 msgid "If you are using this tool to fix a problem with Site Reviews, please %s so that it can be fixed."
 msgstr "If you are using this tool to fix a problem with Site Reviews, please %s so that it can be fixed."
 
 #. translators: %s: link to wordpress.org
-#: views/pages/tools/general/rollback-plugin.php:15
+#: views/pages/tools/general/rollback-plugin.php:14
 #, php-format
 msgctxt "wordpress.org (admin-text)"
 msgid "Unable to connect to %s to get the available plugin versions."
@@ -8561,9 +8557,9 @@ msgctxt "admin-text"
 msgid "If you would like to keep the pagination links but prevent search engines from indexing them, add the following lines to your %1$s file: %2$s"
 msgstr ""
 
-#. translators: %1$s: opening tag of a link to the Google documentation, %2$s: closing tag
+#. translators: %1$s: opening link tag, %2$s: closing link tag
 #: config/settings.php:539
-#: views/pages/settings/schema.php:13
+#: views/pages/settings/schema.php:11
 #, php-format
 msgctxt "admin-text"
 msgid "Google limits the schema types that can trigger review rich results in search. To learn more, please %1$sread this%2$s."
@@ -8775,7 +8771,7 @@ msgid "The file \"%1$s\" exceeds the upload_max_filesize ini directive (limit is
 msgstr ""
 
 #. translators: %1$s: link to the @id schema property documentation, %2$s: link with the text "Custom Fields metabox", %3$s: link to the schema filter hook documentation
-#: views/pages/settings/schema.php:26
+#: views/pages/settings/schema.php:24
 #, php-format
 msgctxt "admin-text"
 msgid "In some cases it may be useful to link the Site Reviews schema with other schema on your page, this is done by adding the %1$s unique identifier property to each schema that you wish to link. If you are using Woocommerce and have set the Schema Type to \"Product\", Site Reviews will automatically do this for you. In all other cases, either use the <code>schema_identifier</code> Custom Field name in the %2$s, or use the %3$s hook."
@@ -8783,14 +8779,14 @@ msgstr ""
 
 #. translators: %1$s: link to the WordPress Export tool, %2$s: link to the WordPress Import tool
 #: views/pages/tools/general/export-reviews.php:17
-#: views/pages/tools/general/import-reviews.php:24
+#: views/pages/tools/general/import-reviews.php:22
 #, php-format
 msgctxt "admin-text"
 msgid "You can also use the WordPress %1$s and %2$s tools to export and import your reviews and categories."
 msgstr ""
 
 #. translators: %1$s: installed plugin version, %2$s: plugin name
-#: views/pages/tools/general/rollback-plugin.php:29
+#: views/pages/tools/general/rollback-plugin.php:27
 #, php-format
 msgctxt "admin-text"
 msgid "You currently have version %1$s installed of %2$s. Run this tool to rollback to a previous release."
@@ -8968,3 +8964,18 @@ msgid "%1$s has not been tested with the installed version of %2$s and may need 
 msgid_plural "%1$s has not been tested with the installed versions of the following plugins and may need an update: %2$s"
 msgstr[0] ""
 msgstr[1] ""
+
+#: plugin/Overrides/ScheduledActionsTable.php:506
+msgctxt "admin-text"
+msgid "async"
+msgstr ""
+
+#: plugin/Commands/ProcessCsvFile.php:82
+msgctxt "admin-text"
+msgid "Another import is already running. Please try again in a couple of minutes."
+msgstr ""
+
+#: plugin/Commands/ProcessCsvFile.php:148
+msgctxt "admin-text"
+msgid "Duplicate row"
+msgstr ""

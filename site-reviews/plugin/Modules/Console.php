@@ -71,7 +71,7 @@ class Console
 
     public function getRaw(): string
     {
-        return htmlspecialchars_decode($this->get(), ENT_QUOTES);
+        return htmlspecialchars_decode($this->get(), \ENT_QUOTES);
     }
 
     public function getLevel(): int
@@ -127,7 +127,7 @@ class Console
             glsr(Dump::class)->dump($message),
             $backtraceLine
         );
-        file_put_contents($this->file, $entry.PHP_EOL, FILE_APPEND | LOCK_EX);
+        file_put_contents($this->file, $entry.\PHP_EOL, \FILE_APPEND | \LOCK_EX);
         apply_filters('console', $message, $levelName, $backtraceLine); // Show in Blackbar plugin if installed
         $this->reset();
         return $this;
@@ -140,7 +140,7 @@ class Console
         foreach ($once as $entry) {
             $levelName = Arr::get($entry, 'level');
             if (in_array($levelName, $levels)) {
-                $level = Arr::get(array_flip($levels), $levelName);
+                $level = Arr::getAs('int', array_flip($levels), $levelName);
                 $message = Arr::get($entry, 'message');
                 $backtraceLine = Arr::get($entry, 'backtrace');
                 $this->log($level, $message, [], $backtraceLine);

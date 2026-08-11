@@ -42,7 +42,7 @@ class DownloadCsvTemplate extends AbstractCommand
             $writer->insertOne(array_keys($this->data()));
             $writer->insertOne(array_values($this->data()));
             nocache_headers();
-            $writer->output('reviews-template.csv');
+            $writer->download('reviews-template.csv');
             glsr_exit();
         } catch (CannotInsertRecord $e) {
             $this->fail();
@@ -120,8 +120,9 @@ class DownloadCsvTemplate extends AbstractCommand
                 if ('default' !== $group && glsr_addon_required($group)) {
                     /* translators: %s: link to the addon page */
                     $text = _x('%s addon required.', 'link to addon page (admin-text)', 'site-reviews');
-                    $notice = sprintf('<div class="glsr-notice-inline components-notice is-warning">%s</div>',
-                        sprintf($text, glsr_premium_link($group))
+                    $notice = wp_get_admin_notice(
+                        sprintf($text, glsr_premium_link($group)),
+                        ['type' => 'warning', 'additional_classes' => ['inline']]
                     );
                 }
                 $data[$name] = compact('description', 'notice', 'required');
@@ -133,8 +134,8 @@ class DownloadCsvTemplate extends AbstractCommand
 
     protected function writer(): Writer
     {
-        $writer = Writer::createFromString('');
-        $writer->addFormatter(new EscapeFormula());
+        $writer = Writer::fromString('');
+        $writer->addFormatter((new EscapeFormula())->escapeRecord(...));
         return $writer;
     }
 }

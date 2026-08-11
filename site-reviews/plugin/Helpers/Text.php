@@ -16,7 +16,7 @@ class Text
             $excerptLength = mb_strlen($excerpt);
         }
         $paragraphs = static::extractParagraphs($text, $excerptLength);
-        $text = implode(PHP_EOL, $paragraphs);
+        $text = implode(\PHP_EOL, $paragraphs);
         return static::restoreTags($text, $map);
     }
 
@@ -37,7 +37,7 @@ class Text
      */
     public static function name(?string $name, string $nameFormat = '', string $initialType = 'space'): string
     {
-        $names = preg_split('/\W/u', (string) $name, 0, PREG_SPLIT_NO_EMPTY);
+        $names = preg_split('/\W/u', (string) $name, 0, \PREG_SPLIT_NO_EMPTY);
         $firstName = (string) array_shift($names);
         $lastName = (string) array_pop($names);
         $nameFormat = Str::restrictTo('first,first_initial,last_initial,initials', $nameFormat, '');
@@ -64,18 +64,20 @@ class Text
 
     public static function normalize(?string $text): string
     {
-        $text = (new SanitizeTextHtml($text))->run();
+        $sanitizer = new SanitizeTextHtml($text);
+        $text = $sanitizer->run();
         $text = strip_shortcodes($text);
         $text = excerpt_remove_blocks($text); // just in case...
         $text = str_replace(']]>', ']]&gt;', $text);
         $text = normalize_whitespace($text); // normalize EOL characters and strip duplicate whitespace.
-        $text = preg_replace('/\R{1,}/u', PHP_EOL.PHP_EOL, $text); // replace all line-breaks with a double line break
+        $text = preg_replace('/\R{1,}/u', \PHP_EOL.\PHP_EOL, $text); // replace all line-breaks with a double line break
         $text = wptexturize($text); // replace common plain text characters with formatted entities.
         $text = ent2ncr($text); // convert named entities into numbered entities.
         $text = convert_chars($text); // converts lone & characters into &#038;
         $text = convert_invalid_entities($text); // convert invalid Unicode references range to valid range.
         $text = convert_smilies($text); // convert text smilies to emojis.
         $text = wp_specialchars_decode($text);
+        $text = wp_kses($text, $sanitizer->allowedHtml()); // strip any tag the trailing decode re-formed past the sanitizer.
         return $text;
     }
 
@@ -84,7 +86,7 @@ class Text
         $text = static::normalize($text);
         if ($paragraphs = preg_split('/\R+/um', $text)) { // split text by line-breaks
             $paragraphs = array_map('trim', $paragraphs); // trim paragraphs
-            $text = implode(PHP_EOL.PHP_EOL, $paragraphs);
+            $text = implode(\PHP_EOL.\PHP_EOL, $paragraphs);
         }
         return wpautop($text);
     }

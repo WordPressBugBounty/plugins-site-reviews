@@ -1,5 +1,5 @@
 <?php defined('ABSPATH') || exit;
-    $dir = pathinfo(__FILE__, PATHINFO_FILENAME);
+    $dir = basename(__FILE__, '.php');
     $files = [];
     $iterator = new DirectoryIterator(trailingslashit(__DIR__).$dir);
     foreach ($iterator as $fileinfo) {
@@ -21,9 +21,10 @@
     </h3>
     <div id="shortcode-site_reviews_summary" class="inside">
         <h3>This shortcode displays a rating summary of your reviews.</h3>
-        <div class="glsr-notice-inline components-notice is-info">
-            <p class="components-notice__content">Each example below demonstrates a different shortcode option. If you need to use multiple options, simply combine the options together (separated with a space) in the same shortcode.</p>
-        </div>
+        <?php echo wp_get_admin_notice(
+            'Each example below demonstrates a different shortcode option. If you need to use multiple options, simply combine the options together (separated with a space) in the same shortcode.',
+            ['type' => 'info', 'additional_classes' => ['inline']]
+        ); ?>
         <?php
             foreach ($files as $file) {
                 include $file;

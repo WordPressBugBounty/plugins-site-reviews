@@ -72,7 +72,7 @@ class ProductReviewsController extends \WC_REST_Product_Reviews_Controller
             return $review;
         }
         $force = Arr::getAs('bool', $request, 'force', false);
-        $supportsTrash = apply_filters('woocommerce_rest_product_review_trashable', EMPTY_TRASH_DAYS > 0, $review);
+        $supportsTrash = apply_filters('woocommerce_rest_product_review_trashable', \EMPTY_TRASH_DAYS > 0, $review);
         $request->set_param('context', 'edit');
         if ($force) {
             $previous = $this->prepare_item_for_response($review, $request);
@@ -224,9 +224,6 @@ class ProductReviewsController extends \WC_REST_Product_Reviews_Controller
         }
         // update review post
         $postArgs = $this->prepare_item_for_update($request);
-        if (is_wp_error($postArgs)) {
-            return $postArgs;
-        }
         $postArgs['ID'] = $review->ID;
         $updatePost = wp_update_post($postArgs, $wperror = true);
         if (is_wp_error($updatePost)) {
@@ -362,7 +359,7 @@ class ProductReviewsController extends \WC_REST_Product_Reviews_Controller
     /**
      * @param \WP_REST_Request $request
      *
-     * @return array|\WP_Error
+     * @return array
      */
     protected function prepare_item_for_update($request)
     {

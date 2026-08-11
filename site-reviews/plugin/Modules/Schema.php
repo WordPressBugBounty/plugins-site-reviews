@@ -113,7 +113,7 @@ class Schema
     public function render(): void
     {
         if ($schema = $this->retrieve()) {
-            $json = (string) wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $json = (string) wp_json_encode($schema, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES);
             printf('<script type="application/ld+json" class="%s-schema">%s</script>', glsr()->id, $json);
         }
     }
@@ -245,10 +245,10 @@ class Schema
             $type = $this->getSchemaOption('type', 'LocalBusiness');
         }
         $className = Helper::buildClassName($type, 'Modules\Schema');
-        return Helper::ifTrue(class_exists($className),
-            fn () => new $className(),
-            fn () => new UnknownType($type)
-        );
+        if (class_exists($className)) {
+            return new $className();
+        }
+        return new UnknownType($type);
     }
 
     protected function getThingDescription(): string
@@ -306,11 +306,11 @@ class Schema
             $url = get_category_link($queried);
         } elseif (is_tag()) {
             $url = get_tag_link($queried);
-        } elseif (is_author()) {
+        } elseif (is_author() && $queried instanceof \WP_User) {
             $url = get_author_posts_url($queried->ID);
         } elseif (is_post_type_archive()) {
             $url = get_post_type_archive_link($queried->name);
-        } elseif (is_tax()) {
+        } elseif (is_tax() && $queried instanceof \WP_Term) {
             $url = get_term_link($queried);
         }
         if (!empty($url) && !is_wp_error($url)) {
