@@ -2,7 +2,7 @@
 # This file is distributed under the GPL3.
 msgid ""
 msgstr ""
-"Project-Id-Version: Site Reviews 8.3.0\n"
+"Project-Id-Version: Site Reviews 8.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/site-reviews\n"
 "Last-Translator: Paul Ryley <paul@geminilabs.io>\n"
 "Language-Team: Gemini Labs <support@geminilabs.io>\n"
@@ -1686,7 +1686,7 @@ msgstr ""
 
 #: config/settings.php:553
 msgctxt "admin-text"
-msgid "Use the assigned or current page title"
+msgid "Use the current page title"
 msgstr ""
 
 #: config/settings.php:554
@@ -1707,7 +1707,7 @@ msgstr ""
 
 #: config/settings.php:581
 msgctxt "admin-text"
-msgid "Use the assigned or current page excerpt"
+msgid "Use the current page excerpt"
 msgstr ""
 
 #: config/settings.php:582
@@ -1728,7 +1728,7 @@ msgstr ""
 
 #: config/settings.php:609
 msgctxt "admin-text"
-msgid "Use the assigned or current page URL"
+msgid "Use the current page URL"
 msgstr ""
 
 #: config/settings.php:610
@@ -1749,7 +1749,7 @@ msgstr ""
 
 #: config/settings.php:637
 msgctxt "admin-text"
-msgid "Use the featured image of the assigned or current page"
+msgid "Use the featured image of the current page"
 msgstr ""
 
 #: config/settings.php:638
