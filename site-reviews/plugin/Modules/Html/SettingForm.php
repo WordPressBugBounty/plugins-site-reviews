@@ -43,14 +43,7 @@ class SettingForm extends Form
     {
         if (str_starts_with($name, 'settings.')) {
             $parts = explode('.', $name);
-            $group = count($parts) > 2 ? $parts[1] : '';
-            // A host's settings mount under its own slug (settings.{hostSlug}.*)
-            // but display on the addons tab (which the host relabels).
-            $addon = OptionManager::addons()[$group] ?? null;
-            if ($addon && $addon->isHost()) {
-                $group = 'addons';
-            }
-            $args['group'] = $group;
+            $args['group'] = count($parts) > 2 ? $parts[1] : '';
         }
         return parent::field($name, $args);
     }
@@ -196,12 +189,14 @@ class SettingForm extends Form
             $results[$addon] ??= '';
             $results[$addon] .= $field->build();
         }
-        ksort($results);
-        $subsubsub = array_map('ucfirst', array_keys($results));
-        $subsubsub = glsr()->filterArray('addon/subsubsub', $subsubsub);
+        $addons = OptionManager::addons();
+        $label = fn (string $slug) => isset($addons[$slug]) ? $addons[$slug]->label() : ucfirst($slug);
+        uksort($results, fn ($a, $b) => strnatcasecmp($label($a), $label($b)));
+        $subsubsub = array_combine(array_keys($results), array_map($label, array_keys($results)));
         return [
             'settings' => $results,
             'subsubsub' => $subsubsub,
+            'tab' => $group,
         ];
     }
 
@@ -232,6 +227,11 @@ class SettingForm extends Form
         return [
             'context' => compact('rows'),
         ];
+    }
+
+    protected function templateDataForPremium(string $group): array
+    {
+        return $this->templateDataForAddons($group);
     }
 
     protected function templateDataForStrings(string $group): array

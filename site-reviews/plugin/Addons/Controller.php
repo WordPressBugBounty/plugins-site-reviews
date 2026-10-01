@@ -48,7 +48,7 @@ abstract class Controller extends AbstractController
     {
         $actions = [];
         if (glsr()->hasPermission('settings') && !empty($this->app()->config('settings'))) {
-            $actions['settings'] = glsr_admin_link("settings.addons.{$this->app()->slug}", _x('Settings', 'admin-text', 'site-reviews'));
+            $actions['settings'] = glsr_admin_link("settings.{$this->app()->settingsPath()}", _x('Settings', 'admin-text', 'site-reviews'));
         }
         return array_merge($actions, $links);
     }
@@ -96,9 +96,13 @@ abstract class Controller extends AbstractController
      */
     public function filterDocumentation(array $documentation): array
     {
-        $notice = glsr()->build('views/partials/addons/support-notice', [
-            'addon_id' => $this->app()->id,
-        ]);
+        $app = $this->app();
+        $isPremium = $app instanceof Addon && ($app->isHost() || null !== $app->hostedBy());
+        $notice = $isPremium
+            ? '' // the Premium tab shows one notice for all its sections
+            : glsr()->build('views/partials/addons/support-notice', [
+                'addon_id' => $this->app()->id,
+            ]);
         $support = $this->app()->build('views/documentation');
         $documentation[$this->app()->id] = $notice.$support;
         return $documentation;
@@ -274,7 +278,8 @@ abstract class Controller extends AbstractController
         }
         $actions = [];
         if (glsr()->hasPermission('documentation')) {
-            $actions['documentation'] = glsr_admin_link('documentation.addons', [
+            $tab = strtok($this->app()->settingsPath(), '.');
+            $actions['documentation'] = glsr_admin_link("documentation.{$tab}", [
                 'data-expand' => "#addon-{$this->app()->id}",
                 'text' => _x('Documentation', 'admin-text', 'site-reviews'),
             ]);
@@ -317,14 +322,6 @@ abstract class Controller extends AbstractController
             $config[$mount($key)] = $values;
         }
         return array_merge($config, $settings);
-    }
-
-    /**
-     * @filter site-reviews/addon/subsubsub
-     */
-    public function filterSubsubsub(array $subsubsub): array
-    {
-        return $subsubsub;
     }
 
     /**
@@ -415,6 +412,7 @@ abstract class Controller extends AbstractController
         $option = glsr()->prefix."activated_{$this->app()->id}";
         if (empty(get_option($option))) {
             update_option($option, true);
+            add_option($this->versionOption(), $this->app()->version, '', true); // This is a fresh install
             if ($this->app()->post_type) {
                 glsr(Role::class)->reset($this->filterRoles([
                     'administrator' => [],
@@ -444,6 +442,19 @@ abstract class Controller extends AbstractController
             $this->app()->action('deactivated');
             restore_current_blog();
         }
+    }
+
+    /**
+     * @action admin_init:11
+     */
+    public function onUpgrade(): void
+    {
+        $stored = Cast::toString(get_option($this->versionOption(), ''));
+        if ($stored === $this->app()->version) {
+            return;
+        }
+        update_option($this->versionOption(), $this->app()->version, true);
+        $this->app()->action('upgraded', $stored, $this->app()->version);
     }
 
     /**
@@ -546,5 +557,10 @@ abstract class Controller extends AbstractController
                 wp_script_add_data($args[0], 'strategy', 'defer');
             }
         }
+    }
+
+    protected function versionOption(): string
+    {
+        return glsr()->prefix."version_{$this->app()->id}";
     }
 }

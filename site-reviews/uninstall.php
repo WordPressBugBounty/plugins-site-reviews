@@ -101,7 +101,9 @@ function glsr_uninstall_all_delete_tables()
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_assigned_users");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_assigned_terms");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_assigned_posts");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_stats");
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_ratings");
+    $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}glsr_tmp");
 }
 
 function glsr_uninstall_all_delete_uploads()
@@ -221,7 +223,7 @@ if (!function_exists('get_sites')) {
     global $wpdb;
     $siteIds = $wpdb->get_col("SELECT blog_id FROM {$wpdb->blogs}");
 } else {
-    $siteIds = get_sites(['count' => false, 'fields' => 'ids']);
+    $siteIds = get_sites(['count' => false, 'fields' => 'ids', 'number' => 0]); // every site, not the default 100
 }
 foreach ($siteIds as $siteId) {
     switch_to_blog($siteId);
