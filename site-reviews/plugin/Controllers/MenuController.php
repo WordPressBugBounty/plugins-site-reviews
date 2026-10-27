@@ -14,6 +14,7 @@ use GeminiLabs\SiteReviews\Modules\Console;
 use GeminiLabs\SiteReviews\Modules\Html\Builder;
 use GeminiLabs\SiteReviews\Modules\Html\SettingForm;
 use GeminiLabs\SiteReviews\Modules\Notice;
+use GeminiLabs\SiteReviews\Modules\UpdateLock;
 use GeminiLabs\SiteReviews\Overrides\ScheduledActionsTable;
 
 class MenuController extends AbstractController
@@ -79,7 +80,7 @@ class MenuController extends AbstractController
             }
             add_submenu_page($parentSlug, $title, $title, glsr()->getPermission($slug), $slugPrefix.$slug, $callback);
         }
-        foreach ($submenu[$parentSlug] as $index => $menu) {
+        foreach ($submenu[$parentSlug] ?? [] as $index => $menu) {
             $slug = $menu[2] ?? '';
             if (!str_starts_with($slug, $slugPrefix)) {
                 continue;
@@ -152,7 +153,7 @@ class MenuController extends AbstractController
     public function renderPremiumMenuCallback(): void
     {
         $features = [];
-        $data = glsr(Api::class)->get('features')->data();
+        $data = glsr(Api::class)->get('features', ['skip_when_down' => true])->data();
         foreach ($data as $values) {
             $features[] = glsr(FeatureDefaults::class)->restrict($values);
         }
@@ -221,6 +222,7 @@ class MenuController extends AbstractController
                     'id' => glsr()->id,
                 ],
                 'myisam_tables' => Arr::get(glsr(Tables::class)->tableEngines(), 'MyISAM', []),
+                'rollback_locked' => glsr(UpdateLock::class)->isLocked(glsr()->basename),
                 'rollback_script' => file_get_contents(glsr()->path('assets/scripts/rollback.js')),
                 'rollback_versions' => glsr(Cache::class)->getPluginVersions(),
                 'services' => glsr()->filterArray('addon/sync/services', []),

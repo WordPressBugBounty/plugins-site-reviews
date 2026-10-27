@@ -27,6 +27,7 @@ use GeminiLabs\SiteReviews\Modules\Html\Builder;
 use GeminiLabs\SiteReviews\Modules\Migrate;
 use GeminiLabs\SiteReviews\Modules\Notice;
 use GeminiLabs\SiteReviews\Modules\SystemInfo;
+use GeminiLabs\SiteReviews\Modules\UpdateLock;
 use GeminiLabs\SiteReviews\Request;
 use GeminiLabs\SiteReviews\Rollback;
 
@@ -70,6 +71,21 @@ class ToolsController extends AbstractController
             'data' => $command->response(),
             'success' => $command->successful(),
         ]);
+    }
+
+    /**
+     * Forget the stored rollback version once WordPress has processed this plugin.
+     *
+     * @param mixed $upgrader
+     *
+     * @action upgrader_process_complete:1
+     */
+    public function clearRollbackVersion($upgrader, array $options): void
+    {
+        $plugins = (array) ($options['plugins'] ?? []);
+        if ('plugin' === ($options['type'] ?? '') && in_array(glsr()->basename, $plugins, true)) {
+            delete_transient(glsr()->prefix.'rollback_version');
+        }
     }
 
     /**
@@ -209,15 +225,15 @@ class ToolsController extends AbstractController
      */
     public function filterUpdatePluginsTransient($value)
     {
+        if (!is_object($value) || !glsr(Rollback::class)->isUpdateRequest()) {
+            return $value;
+        }
         if ($version = get_transient(glsr()->prefix.'rollback_version')) {
-            $update = (object) [
+            $value->response[glsr()->basename] = (object) [
                 'new_version' => $version,
                 'package' => sprintf('https://downloads.wordpress.org/plugin/%s.%s.zip', glsr()->id, $version),
                 'slug' => glsr()->id,
             ];
-            if (is_object($value)) {
-                $value->response[glsr()->basename] = $update;
-            }
         }
         return $value;
     }
@@ -428,6 +444,11 @@ class ToolsController extends AbstractController
         if (!current_user_can('update_plugins')) {
             wp_send_json_error([
                 'error' => _x('You do not have permission to rollback the plugin.', 'admin-text', 'site-reviews'),
+            ]);
+        }
+        if (glsr(UpdateLock::class)->isLocked(glsr()->basename)) {
+            wp_send_json_error([
+                'error' => _x('Rollback is unavailable because the Site Reviews folder is a git repository.', 'admin-text', 'site-reviews'),
             ]);
         }
         wp_send_json_success(

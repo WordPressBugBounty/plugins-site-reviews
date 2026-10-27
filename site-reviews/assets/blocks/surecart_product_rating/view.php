@@ -18,30 +18,33 @@ if (!$displayEmpty && $ratings->average <= 0) {
     return '';
 }
 
-$textTemplate = str_contains($attributes['text'], '{num}')
-    ? $attributes['text']
-    : '{num}';
+$textTemplate = sanitize_text_field($attributes['text']);
+$textTemplate = str_contains($textTemplate, '{num}') ? $textTemplate : '{num}';
 
 $context = [
     'reviewCount' => $ratings->reviews,
     'textTemplate' => $textTemplate,
 ];
 
+$ratingColor = sanitize_key($attributes['style_rating_color'] ?? '');
+$ratingColorCustom = (string) ($attributes['style_rating_color_custom'] ?? '');
+// A ; would start a second declaration.
+$ratingColorCustom = preg_match('/[;{}\\\\<>"\']/', $ratingColorCustom) ? '' : $ratingColorCustom;
+
 $blockClassAttr = '';
-if (!empty($attributes['style_rating_color']) || !empty($attributes['style_rating_color_custom'])) {
+if (!empty($ratingColor) || !empty($ratingColorCustom)) {
     $blockClassAttr = 'has-rating-color';
 }
 
 $blockStyleAttr = '';
-if (!empty($attributes['style_rating_color'])) {
+if (!empty($ratingColor)) {
     // A theme preset variable is undefined once the theme that provided it is no
     // longer active. Without a fallback the declaration is invalid at computed-value
     // time and the stars become transparent.
-    $fallback = $attributes['style_rating_color_custom'] ?? '';
-    $fallback = $fallback ?: 'currentColor';
-    $blockStyleAttr = "--glsr-review-star-bg: var(--wp--preset--color--{$attributes['style_rating_color']}, {$fallback});";
-} elseif (!empty($attributes['style_rating_color_custom'])) {
-    $blockStyleAttr = "--glsr-review-star-bg: {$attributes['style_rating_color_custom']};";
+    $fallback = $ratingColorCustom ?: 'currentColor';
+    $blockStyleAttr = "--glsr-review-star-bg: var(--wp--preset--color--{$ratingColor}, {$fallback});";
+} elseif (!empty($ratingColorCustom)) {
+    $blockStyleAttr = "--glsr-review-star-bg: {$ratingColorCustom};";
 }
 
 $blockAttributes = get_block_wrapper_attributes([
@@ -51,7 +54,7 @@ $blockAttributes = get_block_wrapper_attributes([
 
 ?>
 <div <?php echo wp_kses_data($blockAttributes); ?>
-    data-wp-context='<?php echo (wp_json_encode($context) ?: '{}'); ?>'
+    <?php echo wp_interactivity_data_wp_context($context); ?>
     data-wp-init="callbacks.init"
     data-wp-interactive="site-reviews/surecart-product-rating"
     data-wp-key="surecart-product-rating-<?php echo (int) $product->id; ?>"
@@ -59,7 +62,7 @@ $blockAttributes = get_block_wrapper_attributes([
     <?php echo glsr_star_rating($ratings->average, $ratings->reviews, compact('theme')); ?>
     <?php if ($attributes['has_text']) { ?>
         <?php if ($attributes['is_link']) { ?>
-            <a href="<?php echo esc_attr($attributes['link_url']); ?>"
+            <a href="<?php echo esc_url($attributes['link_url']); ?>"
                 data-wp-on--click="actions.scroll"
                 data-wp-text="state.formattedText"
             ></a>
