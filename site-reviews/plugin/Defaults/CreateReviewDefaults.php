@@ -7,12 +7,16 @@ use GeminiLabs\SiteReviews\Helpers\Arr;
 /**
  * If this is a form submission, the following fields are overridden:
  * - author_id
+ * - avatar
+ * - date
+ * - date_gmt
  * - ip_address
  * - is_approved
  * - is_pinned
  * - is_verified
  * - response
- * - response_by.
+ * - response_by
+ * - type.
  */
 class CreateReviewDefaults extends DefaultsAbstract
 {
