@@ -120,12 +120,15 @@ class GatekeeperNotice extends AbstractNotice
         if (!current_user_can('install_plugins')) {
             return '';
         }
+        if (!str_starts_with($data['plugin_uri'], 'https://wordpress.org/plugins/')) {
+            return '';
+        }
         return $this->pluginAction([
             'action' => 'install-plugin',
             'admin_page' => 'update.php',
             'name' => $data['name'],
             'nonce_prefix' => 'install-plugin_',
-            'plugin' => $data['textdomain'],
+            'plugin' => dirname($data['plugin']), // wordpress.org names a plugin's folder after its slug
             /* translators: %s: the plugin name */
             'text' => _x('Install %s', 'admin-text', 'site-reviews'),
         ]);
@@ -182,7 +185,7 @@ class GatekeeperNotice extends AbstractNotice
     protected function pluginLinks(array $errors): string
     {
         $links = [];
-        foreach ($errors as $plugin => $data) {
+        foreach ($errors as $data) {
             $links[] = sprintf('<span class="plugin-%s"><a href="%s">%s</a></span>',
                 $data['textdomain'],
                 $data['plugin_uri'],

@@ -59,7 +59,7 @@ class CreateReview extends AbstractCommand
     {
         $this->request = $this->normalize($request); // IP address is set here
         $this->setProperties(); // do this after setting the request
-        $this->review = new Review($this->toArray(), $init = false);
+        $this->review = new Review($this->toArray(), false); // don't init
         $this->validation = new Arguments();
         $this->custom = $this->custom();
         $this->type = $this->type();
@@ -238,11 +238,15 @@ class CreateReview extends AbstractCommand
             $request->set('avatar', '');
             $request->set('date', '');
             $request->set('date_gmt', '');
+            $request->set('geolocation', '');
             $request->set('is_pinned', false);
             $request->set('is_verified', false);
             $request->set('response', '');
             $request->set('response_by', 0);
             $request->set('type', 'local');
+            $request->set('verified', '');
+            $request->set('verified_on', '');
+            $request->set('verified_requested', '');
         }
         glsr()->action('review/request', $request);
         return $request;

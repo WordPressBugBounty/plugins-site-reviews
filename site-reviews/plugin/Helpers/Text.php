@@ -123,7 +123,7 @@ class Text
             return count(preg_split('/[^\p{L}\p{N}\']+/u', $text));
         }
         $wordCount = 0;
-        foreach ($iterator->getPartsIterator() as $part) {
+        while (\IntlBreakIterator::DONE !== $iterator->next()) {
             if (\IntlBreakIterator::WORD_NONE !== $iterator->getRuleStatus()) {
                 ++$wordCount;
             }
@@ -244,6 +244,9 @@ class Text
             return null;
         }
         $iterator = \IntlRuleBasedBreakIterator::createWordInstance('');
+        if (!$iterator instanceof \IntlRuleBasedBreakIterator) { // has getRuleStatus()
+            return null;
+        }
         $normalizedText = \Normalizer::normalize($text);
         if (empty($normalizedText)) {
             return null;
@@ -257,6 +260,7 @@ class Text
     protected static function replaceTags(string $text): array
     {
         $map = [];
+        $text = str_replace('⍈', '&#x2348;', $text); // a ⍈ in the text is not a placeholder
         $result = preg_replace_callback('|<([a-z]+)[^>]*?>.*?</\\1>|siu', function ($matches) use (&$map) {
             $map[] = $matches[0];
             return '⍈';

@@ -205,9 +205,7 @@ class ListTableController extends AbstractController
             if (count(glsr()->retrieveAs('array', 'review_types')) < 2) {
                 unset($filters['type']);
             }
-            foreach ($filters as $key => &$value) {
-                $value = glsr($value)->title();
-            }
+            $filters = array_map(fn ($value) => glsr($value)->title(), $filters);
             ksort($filters);
             $setting = 'edit_'.glsr()->post_type.'_filters';
             $enabled = get_user_meta($userId, $setting, true);
@@ -440,8 +438,10 @@ class ListTableController extends AbstractController
                 } else {
                     $clause['clauses'][] = "AND {$assignedTable}.{$column} = {$value}";
                 }
-            } elseif (in_array($key, ['rating', 'terms', 'type'])) {
+            } elseif (in_array($key, ['rating', 'terms'])) {
                 $clause['clauses'][] = "AND {$ratings}.{$key} = '{$value}'";
+            } elseif ('type' === $key && array_key_exists($value, glsr()->retrieveAs('array', 'review_types'))) {
+                $clause['clauses'][] = "AND {$ratings}.type = '{$value}'";
             } elseif ('author' === $key && '0' === $value) {
                 // Filtering by the "author" URL parameter is automatically done
                 // by WordPress when the value is not empty

@@ -312,7 +312,7 @@ class OptionManager
     {
         $writes = [];
         $versions = [];
-        foreach (static::addons() as $slug => $addon) {
+        foreach (static::addons() as $addon) {
             if ($addon->hostedBy()) {
                 continue; // the host claims its whole subtree, hosted values included
             }
@@ -381,7 +381,7 @@ class OptionManager
     public function wp(string $path, $fallback = '', string $cast = '')
     {
         $option = get_option($path, $fallback);
-        return Cast::to($cast, Helper::ifEmpty($option, $fallback, $strict = true));
+        return Cast::to($cast, Helper::ifEmpty($option, $fallback, true)); // use strict comparison
     }
 
     /**
@@ -392,7 +392,7 @@ class OptionManager
      */
     protected function compose(array $settings): array
     {
-        foreach (static::addons() as $slug => $addon) {
+        foreach (static::addons() as $addon) {
             if ($addon->hostedBy()) {
                 continue; // mounted by its host's whole subtree
             }
